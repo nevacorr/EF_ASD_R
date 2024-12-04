@@ -43,21 +43,26 @@ long_data <- ibis_behav_filtered_2 %>%
     Time == "Flanker_Standard_Age_Corrected" ~ "school_age"
   ))
 
+long_data_cleaned <- long_data %>%
+  filter(!is.na(Score) & !is.na(Age_SchoolAge))  # Remove rows with missing scores and/or missing Age at school age
+
+# Remove columns that will not be used in modeling
+final_data <- long_data_cleaned[, c("Identifiers", "Group", "Sex", "Age_SchoolAge", "Time", "Score")]
 
 # Create a model that relates Flanker Score to EF scores at 12 and 24 months, takes sex and group into account
 # and includes subject number as random factor
-model <- lmer(Score ~ Sex + Group + Time + Age_SchoolAge + (1 | Identifiers), data = long_data)
+model <- lmer(Score ~ Sex + Group + Time + Age_SchoolAge + (1 | Identifiers), data = final_data)
 
 # See estimates for fixed and random effects and test hypotheses about group differences
 summary(model)
 
 # Get predicted values from the model
-long_data$predicted_score <- predict(model, newdata = long_data)
+final_data$predicted_score <- predict(model)
 
 # Plot the predicted scores by Group and Time
-ggplot(long_data, aes(x = Group, y = predicted_score, color = Time)) +
+ggplot(final_data, aes(x = Group, y = predicted_score, color = Time)) +
   geom_boxplot() +
-  labs(title = "Predicted Scores by Group and Time",
+  labs(title = "Predicted Scores by Group and Time (Flanker used for school age)",
        x = "Group", y = "Predicted Score") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))

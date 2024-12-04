@@ -18,51 +18,14 @@ ibis_behav$Group[ibis_behav$Group == ""] <- NA  # Convert empty strings to NA
 # Remove rows with no Group
 ibis_behav_filtered <- ibis_behav[!is.na(ibis_behav$Group), ]
 
-# Remove rows where there is no Flanker score or Flanker score but no AB_12_Percent or AB_24_Percent
-ibis_behav_filtered_2 <- ibis_behav_filtered %>%
-  filter(!is.na(Flanker_Standard_Age_Corrected) & 
-           (!is.na(AB_12_Percent) | !is.na(AB_24_Percent)))
-
 # Convert 'Group' to a factor
-ibis_behav_filtered_2$Group <- factor(ibis_behav_filtered_2$Group)
+ibis_behav_filtered$Group <- factor(ibis_behav_filtered$Group)
 
 # Set 'GroupLR-' as the reference level
-ibis_behav_filtered_2$Group <- relevel(ibis_behav_filtered_2$Group, ref = "LR-")
+ibis_behav_filtered$Group <- relevel(ibis_behav_filtered$Group, ref = "LR-")
 
+source("fit_linear_mixed_effects_model.R")
 
-# Reshape the data from wide to long format
-long_data <- ibis_behav_filtered_2 %>%
-  pivot_longer(
-    cols = c("AB_12_Percent", "AB_24_Percent", "Flanker_Standard_Age_Corrected"),
-    names_to = "Time",
-    values_to = "Score"
-  ) %>%
-  mutate(Time = case_when(
-    Time == "AB_12_Percent" ~ "12_months",
-    Time == "AB_24_Percent" ~ "24_months",
-    Time == "Flanker_Standard_Age_Corrected" ~ "school_age"
-  ))
+model_flanker <- fit_linear_mixed_effects_model("Flanker_Standard_Age_Corrected", ibis_behav_filtered)
+model_dccs <- fit_linear_mixed_effects_model("DCCS_Standard_Age_Corrected", ibis_behav_filtered)
 
-long_data_cleaned <- long_data %>%
-  filter(!is.na(Score) & !is.na(Age_SchoolAge))  # Remove rows with missing scores and/or missing Age at school age
-
-# Remove columns that will not be used in modeling
-final_data <- long_data_cleaned[, c("Identifiers", "Group", "Sex", "Age_SchoolAge", "Time", "Score")]
-
-# Create a model that relates Flanker Score to EF scores at 12 and 24 months, takes sex and group into account
-# and includes subject number as random factor
-model <- lmer(Score ~ Sex + Group + Time + Age_SchoolAge + (1 | Identifiers), data = final_data)
-
-# See estimates for fixed and random effects and test hypotheses about group differences
-summary(model)
-
-# Get predicted values from the model
-final_data$predicted_score <- predict(model)
-
-# Plot the predicted scores by Group and Time
-ggplot(final_data, aes(x = Group, y = predicted_score, color = Time)) +
-  geom_boxplot() +
-  labs(title = "Predicted Scores by Group and Time (Flanker used for school age)",
-       x = "Group", y = "Predicted Score") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))

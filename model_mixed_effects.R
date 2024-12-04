@@ -32,3 +32,4 @@ result_dccs <- fit_linear_mixed_effects_model("DCCS_Standard_Age_Corrected", ibi
 source("plot_model_with_age_by_group.R")
 
 plot_model_with_age_by_group(result_flanker, "Flanker")
+plot_model_with_age_by_group(result_dccs, "DCCS")

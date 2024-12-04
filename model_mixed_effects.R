@@ -9,8 +9,6 @@ library(dplyr)
 
 rm(list = ls())
 
-source("./plot_boxplot_pairs.R")
-
 ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS.csv"))
 
 # Clean the Group column: convert empty strings to NA

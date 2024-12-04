@@ -11,8 +11,8 @@ rm(list = ls())
 
 ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS.csv"))
 
-# Convert empty strings in Group column to NA to NA
-ibis_behav$Group[ibis_behav$Group == ""] <- NA  # Convert empty strings to NA
+# Convert empty strings in Group column to NA 
+ibis_behav$Group[ibis_behav$Group == ""] <- NA  
 
 # Remove rows with no Group
 ibis_behav_filtered_unscaled <- ibis_behav[!is.na(ibis_behav$Group), ]
@@ -26,7 +26,7 @@ ibis_behav_filtered <- scale_columns_to_zscore(ibis_behav_filtered_unscaled,
 # Convert 'Group' to a factor
 ibis_behav_filtered$Group <- factor(ibis_behav_filtered$Group)
 
-# Set 'GroupLR-' as the reference level
+# Set 'GroupLR-' as the reference group
 ibis_behav_filtered$Group <- relevel(ibis_behav_filtered$Group, ref = "LR-")
 
 source("fit_linear_mixed_effects_model.R")

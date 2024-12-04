@@ -1,5 +1,5 @@
 
-# Function to scale specified columns to Z-scores, keeping NaNs intact
+# Function to scale specified columns to Z-scores, keeping NaNs 
 scale_columns_to_zscore <- function(df, columns) {
   scale_with_na <- function(x) {
     # Calculate mean and standard deviation, ignoring NaNs

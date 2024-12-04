@@ -11,12 +11,17 @@ rm(list = ls())
 
 ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS.csv"))
 
-# Clean the Group column: convert empty strings to NA
-# ibis_behav$Group <- trimws(ibis_behav$Group)  # Remove spaces
+# Convert empty strings in Group column to NA to NA
 ibis_behav$Group[ibis_behav$Group == ""] <- NA  # Convert empty strings to NA
 
 # Remove rows with no Group
-ibis_behav_filtered <- ibis_behav[!is.na(ibis_behav$Group), ]
+ibis_behav_filtered_unscaled <- ibis_behav[!is.na(ibis_behav$Group), ]
+
+source("scale_columns_to_zscore.R")
+
+# Scale score columns
+ibis_behav_filtered <- scale_columns_to_zscore(ibis_behav_filtered_unscaled, 
+          c("AB_12_Percent", "AB_24_Percent", "Flanker_Standard_Age_Corrected", "DCCS_Standard_Age_Corrected"))
 
 # Convert 'Group' to a factor
 ibis_behav_filtered$Group <- factor(ibis_behav_filtered$Group)

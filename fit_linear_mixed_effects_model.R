@@ -33,6 +33,7 @@ fit_linear_mixed_effects_model <- function(score_column, data) {
   # See estimates for fixed and random effects and test hypotheses about group differences
   print(paste("Model using", score_column, "as EF"))
   print(summary(model))
+  print(anova(model))
   
   # Get predicted values from the model
   final_data$predicted_score <- predict(model)
@@ -61,7 +62,7 @@ fit_linear_mixed_effects_model <- function(score_column, data) {
   # Calculate the correlation between predicted and actual school age scores
   correlation <- cor(school_age_data$predicted_score, school_age_data$Score)
 
-  # Create the plot with the correlation value in the title (without the regression line)
+  # Create the plot with the correlation value in the title, with a regression line
   plot = ggplot(school_age_data, aes(x = predicted_score, y = Score)) +
     geom_point() +  # scatter plot of predicted vs actual
     geom_smooth(method = "lm", color = "blue", se = FALSE) +  # Add linear regression line without confidence interval shading

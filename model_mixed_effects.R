@@ -23,10 +23,10 @@ ibis_behav_filtered$Group <- factor(ibis_behav_filtered$Group)
 # Set 'GroupLR-' as the reference level
 ibis_behav_filtered$Group <- relevel(ibis_behav_filtered$Group, ref = "LR-")
 
-source("fit_linear_mixed_effects_model.R")
+source("fit_linear_mixed_effects_model_predictschoolage.R")
 
-result_flanker <- fit_linear_mixed_effects_model("Flanker_Standard_Age_Corrected", ibis_behav_filtered)
-result_dccs <- fit_linear_mixed_effects_model("DCCS_Standard_Age_Corrected", ibis_behav_filtered)
+result_flanker <- fit_linear_mixed_effects_model_predictschoolage("Flanker_Standard_Age_Corrected", ibis_behav_filtered)
+result_dccs <- fit_linear_mixed_effects_model_predictschoolage("DCCS_Standard_Age_Corrected", ibis_behav_filtered)
 
 source("plot_model_with_age_by_group.R")
 

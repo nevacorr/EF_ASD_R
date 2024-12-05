@@ -1,5 +1,5 @@
 
-fit_linear_mixed_effects_model <- function(score_column, data) {
+fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) {
   
   # Remove rows where there is no School Age score or School Age score but no AB_12_Percent or AB_24_Percent
   data_filtered <- data %>%

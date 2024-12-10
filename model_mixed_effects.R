@@ -13,12 +13,16 @@ ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBI
 
 # Convert empty strings in Group column to NA 
 ibis_behav$Group[ibis_behav$Group == ""] <- NA  
+ibis_behav$Flanker_Standard_Age_Corrected[ibis_behav$Flanker_Standard_Age_Corrected == ""] <- NA
+ibis_behav$DCCS_Standard_Age_Corrected[ibis_behav$DCCS_Standard_Age_Corrected == ""] <- NA
 
 # Remove rows with no Group
 ibis_behav_filtered <- ibis_behav[!is.na(ibis_behav$Group), ]
 
-# Convert 'Group' to a factor
+# Convert Group and Sex to factors
+ibis_behav_filtered$Sex <- factor(ibis_behav_filtered$Sex)
 ibis_behav_filtered$Group <- factor(ibis_behav_filtered$Group)
+ibis_behav_filtered$Identifiers <- factor(ibis_behav_filtered$Identifiers)
 
 # Set 'GroupLR-' as the reference level
 ibis_behav_filtered$Group <- relevel(ibis_behav_filtered$Group, ref = "LR-")
@@ -28,7 +32,8 @@ source("fit_linear_mixed_effects_model_predictschoolage.R")
 result_flanker <- fit_linear_mixed_effects_model_predictschoolage("Flanker_Standard_Age_Corrected", ibis_behav_filtered)
 result_dccs <- fit_linear_mixed_effects_model_predictschoolage("DCCS_Standard_Age_Corrected", ibis_behav_filtered)
 
-source("plot_model_with_age_by_group.R")
+# source("plot_model_with_age_by_group.R")
+# 
+# plot_model_with_age_by_group(result_flanker, "Flanker")
+# plot_model_with_age_by_group(result_dccs, "DCCS")
 
-plot_model_with_age_by_group(result_flanker, "Flanker")
-plot_model_with_age_by_group(result_dccs, "DCCS")

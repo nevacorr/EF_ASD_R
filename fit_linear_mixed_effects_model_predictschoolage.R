@@ -8,86 +8,76 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) 
   data_filtered <- data_filtered %>%
     filter(!is.na(score_column) & (!is.na(AB_12_Percent) & !is.na(AB_24_Percent)))
   
-  # data_filtered <- data_filtered %>%
-    # filter(!(is.na(AB_12_Percent) & is.na(AB_24_Percent)))
-  
   # Keep only columns that will be used in modeling
-  final_data <- data_filtered[, c("Identifiers", "Group", "Sex", "AB_12_Percent", "AB_24_Percent", score_column)]
+  final_data <- data_filtered[, c("Identifiers", "Group", "Sex", "AB_12_Percent", "AB_24_Percent", "Risk", score_column)]
 
   final_data$Sex <- factor(final_data$Sex)
-  
-  lengths <- sapply(final_data, length)
-  print(lengths)
-  
-  print(sum(is.na(final_data$Sex)))
-  print(sum(is.na(final_data$Group)))
-  print(sum(is.na(final_data$AB_12_Percent)))
-  print(sum(is.na(final_data$AB_24_Percent)))
-  
-  print(class(final_data$Sex))  # should be "factor"
-  print(class(final_data$Group))  # should be "factor"
-  
-  print(class(final_data$AB_12_Percent))  # should be "numeric"
-  print(class(final_data$AB_24_Percent))  # should be "numeric"
-  
-  print(anyDuplicated(final_data))
   
   # browser()
   
   # Create a model that relates School Age EF Score to EF scores at 12 and 24 months, takes sex and group into account
   # and includes subject as random factor
   
-  # Dynamically construct the formula
-  formula <- as.formula(paste(score_column, "~ Sex + Group + AB_24_Percent"))
+  # Construct the formula
+  formula1 <- as.formula(paste(score_column, "~ AB_12_Percent"))
+  formula2 <- as.formula(paste(score_column, "~ AB_24_Percent"))
+  formula3 <- as.formula(paste(score_column, "~ AB_12_Percent + AB_24_Percent"))
+  formula4 <- as.formula(paste(score_column, "~ Risk + AB_12_Percent + AB_24_Percent"))
+  formula5 <- as.formula(paste(score_column, "~ Group + AB_12_Percent + AB_24_Percent"))
+  formula6 <- as.formula(paste(score_column, "~ Sex + Group + AB_12_Percent + AB_24_Percent"))
+  formula7 <- as.formula(paste(score_column, "~ Sex + Risk + AB_12_Percent + AB_24_Percent"))
   
-  model <- lm(formula, data = final_data)
+  model1 <- lm(formula1, data = final_data)
+  model2 <- lm(formula2, data = final_data)
+  model3 <- lm(formula3, data = final_data)
+  model4 <- lm(formula4, data = final_data)
+  model5 <- lm(formula5, data = final_data)
+  model6 <- lm(formula6, data = final_data)
+  model7 <- lm(formula6, data = final_data)
   
-  # See estimates for fixed and random effects and test hypotheses about group differences
-  # print(paste("Model using", score_column, "as EF"))
-  print(summary(model))
-  # print(anova(model))
+  # Get the AIC values
+  aic_value1 <- AIC(model1)
+  aic_value2 <- AIC(model2)
+  aic_value3 <- AIC(model3)
+  aic_value4 <- AIC(model4)
+  aic_value5 <- AIC(model5)
+  aic_value6 <- AIC(model6)
+  aic_value7 <- AIC(model7)
   
-#   # Get predicted values from the model
-#   final_data$predicted_score <- predict(model)
-#   
-#   # Plot the predicted scores by Group and Time
-#   plot <- ggplot(final_data, aes(x = Group, y = predicted_score)) +
-#     geom_boxplot() +
-#     labs(
-#       title = paste("Predicted Scores by Group and Time\n(", score_column,
-#                     " Used for School Age Score)", sep = ""),
-#       x = "Group",
-#       y = "Predicted Score"
-#     ) +
-#     theme_minimal() +
-#     theme(axis.text.x = element_text(angle = 45, hjust = 1))
-#   
-#   print(plot)
-#   
-#   # Filter the data to keep only rows for school age scores
-#   school_age_data <- final_data %>%
-#     filter(Time == "school_age")
-# 
-#   # Predict the scores for school age using the model
-#   school_age_data$predicted_score <- predict(model, newdata = school_age_data)
-# 
-#   # Calculate the correlation between predicted and actual school age scores
-#   correlation <- cor(school_age_data$predicted_score, school_age_data$Score)
-# 
-#   # Create the plot with the correlation value in the title, with a regression line
-#   plot = ggplot(school_age_data, aes(x = predicted_score, y = Score)) +
-#     geom_point() +  # scatter plot of predicted vs actual
-#     geom_smooth(method = "lm", color = "blue", se = FALSE) +  # Add linear regression line without confidence interval shading
-#     labs(
-#       title = paste("Predicted vs Actual Scores at School Age:", score_column,"\nCorrelation: ", round(correlation, 2)),
-#       x = "Predicted Score (from 12 and 24 months)",
-#       y = "Actual School Age Score"
-#     ) +
-#     theme_minimal()
-# 
-#   print(plot)
-#   
-#   # Return both final_data and model as a list
-#   return(list(final_data = final_data, model = model))
-# 
+  # Print AIC
+  print(paste("model 1 AIC: ", aic_value1))
+  print(paste("model 2 AIC: ", aic_value2))
+  print(paste("model 3 AIC: ", aic_value3))
+  print(paste("model 4 AIC: ", aic_value4))
+  print(paste("model 5 AIC: ", aic_value5))
+  print(paste("model 6 AIC: ", aic_value6))
+  print(paste("model 7 AIC: ", aic_value7))
+  
+  print(summary(model1))
+  
+  correlation12 <- cor(final_data$AB_12_Percent, final_data[[score_column]])
+  # Scatter plot 
+  p1 <- ggplot(data = final_data, aes(x = AB_12_Percent, y = .data[[score_column]])) +
+    geom_point() +  # Add points to the plot
+    geom_smooth(method = "lm", se = FALSE, color = "blue") +
+    labs(
+      title = paste("Scatter plot of EF 12 mo vs EF School Age\nCorrelation: ", round(correlation12, 2)),
+      x = "EF 12mo", 
+      y = "EF School Age") +
+    theme_minimal()
+  
+  correlation24 <- cor(final_data$AB_24_Percent, final_data[[score_column]])
+  # Scatter plot 
+  p2 <- ggplot(data = final_data, aes(x = AB_24_Percent, y = .data[[score_column]])) +
+    geom_point() +  # Add points to the plot
+    geom_smooth(method = "lm", se = FALSE, color = "blue") +
+    labs(
+      title = paste("Scatter plot of EF 24 mo vs EF School Age\nCorrelation: ", round(correlation24, 2)),
+      x = "EF 24mo", 
+      y = "EF School Age") +
+    theme_minimal()
+  
+  print(p1)
+  print(p2)
+  
 }

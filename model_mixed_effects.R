@@ -32,8 +32,5 @@ source("fit_linear_mixed_effects_model_predictschoolage.R")
 result_flanker <- fit_linear_mixed_effects_model_predictschoolage("Flanker_Standard_Age_Corrected", ibis_behav_filtered)
 result_dccs <- fit_linear_mixed_effects_model_predictschoolage("DCCS_Standard_Age_Corrected", ibis_behav_filtered)
 
-# source("plot_model_with_age_by_group.R")
-# 
-# plot_model_with_age_by_group(result_flanker, "Flanker")
-# plot_model_with_age_by_group(result_dccs, "DCCS")
+
 

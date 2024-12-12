@@ -2,11 +2,16 @@
 fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) {
   
   # Remove rows with no school age score
-  data_filtered <- data[!is.na(data[[score_column]]), ]
+  data_filtered0 <- data[!is.na(data[[score_column]]), ]
   
-  # Remove rows where there is no School Age score or School Age score but no AB_12_Percent or AB_24_Percent
-  data_filtered <- data_filtered %>%
-    filter(!is.na(score_column) & (!is.na(AB_12_Percent) & !is.na(AB_24_Percent)))
+  data_no12 <- data_filtered0[is.na(data_filtered0[["AB_12_Percent"]]), ]
+  data_no24 <- data_filtered0[is.na(data_filtered0[["AB_24_Percent"]]), ]
+  
+  # Remove rows where there is missing School Age score  AB_12_Percent or AB_24_Percent
+  data_filtered <- data_filtered0 %>%
+    filter(!is.na(AB_12_Percent) & !is.na(AB_24_Percent))
+  
+  browser()
   
   # Keep only columns that will be used in modeling
   final_data <- data_filtered[, c("Identifiers", "Group", "Sex", "AB_12_Percent", "AB_24_Percent", "Risk", score_column)]
@@ -53,7 +58,7 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) 
   print(paste("model 6 AIC: ", aic_value6))
   print(paste("model 7 AIC: ", aic_value7))
   
-  print(summary(model1))
+  print(summary(model6))
   
   correlation12 <- cor(final_data$AB_12_Percent, final_data[[score_column]])
   # Scatter plot 
@@ -61,7 +66,7 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) 
     geom_point() +  # Add points to the plot
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     labs(
-      title = paste("Scatter plot of EF 12 mo vs EF School Age\nCorrelation: ", round(correlation12, 2)),
+      title = paste("Scatter plot of EF 12 mo vs", score_column, "\nCorrelation: ", round(correlation12, 2)),
       x = "EF 12mo", 
       y = "EF School Age") +
     theme_minimal()
@@ -72,7 +77,7 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) 
     geom_point() +  # Add points to the plot
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     labs(
-      title = paste("Scatter plot of EF 24 mo vs EF School Age\nCorrelation: ", round(correlation24, 2)),
+      title = paste("Scatter plot of EF 24 mo vs", score_column, "\nCorrelation: ", round(correlation24, 2)),
       x = "EF 24mo", 
       y = "EF School Age") +
     theme_minimal()

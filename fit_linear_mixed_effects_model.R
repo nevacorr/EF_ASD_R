@@ -1,13 +1,8 @@
 
 fit_linear_mixed_effects_model <- function(score_column, data) {
   
-  # Remove rows where there is no School Age score or School Age score but no AB_12_Percent or AB_24_Percent
-  data_filtered <- data %>%
-    filter(!is.na(score_column) & 
-             (!is.na(AB_12_Percent) | !is.na(AB_24_Percent)))
-  
   # Reshape the data from wide to long format
-  long_data <- data_filtered %>%
+  long_data <- data %>%
     pivot_longer(
       cols = c("AB_12_Percent", "AB_24_Percent", score_column),
       names_to = "Time",
@@ -20,7 +15,9 @@ fit_linear_mixed_effects_model <- function(score_column, data) {
     ))
   
   long_data_cleaned <- long_data %>%
-    filter(!is.na(Score) & !is.na(Age_SchoolAge))  # Remove rows with missing scores and/or missing Age at school age
+    filter(!is.na(Score))  # Remove rows with missing scores
+  
+  browser()
   
   # Keep only columns that will be used in modeling
   final_data <- long_data_cleaned[, c("Identifiers", "Group", "Sex", "Age_SchoolAge", "Time", "Score")]

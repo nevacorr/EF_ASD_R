@@ -11,7 +11,7 @@ plot_model_with_age_by_group <- function(result, score_column) {
     geom_line(aes(linetype = Group), size = 1) +  # Line for each group
     geom_point(size = 2) +  # Points for each predicted score
     labs(
-      title = paste("Predicted Scores by Group and Age\n(", score_column, " Used for School Age Score)", sep = ""),
+      title = paste("Model of Scores by Group and Age\n(", score_column, " Used for School Age Score)", sep = ""),
       x = "Age",
       y = "Predicted Score"
     ) +

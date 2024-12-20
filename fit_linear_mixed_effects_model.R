@@ -17,15 +17,13 @@ fit_linear_mixed_effects_model <- function(score_column, data) {
   long_data_cleaned <- long_data %>%
     filter(!is.na(Score))  # Remove rows with missing scores
   
-  browser()
-  
   # Keep only columns that will be used in modeling
   final_data <- long_data_cleaned[, c("Identifiers", "Group", "Sex", "Age_SchoolAge", "Time", "Score")]
   
   # Create a model that relates School Age EF Score to EF scores at 12 and 24 months, takes sex and group into account
   # and includes subject as random factor
   # model <- lmer(Score ~ Sex + Group + Time + Age_SchoolAge + (1 | Identifiers), data = final_data)
-  model <- lmer(Score ~ Sex + Group + Time + (1 | Identifiers), data = final_data)
+  model <- lmer(Score ~ Sex + Group * Time + (1 | Identifiers), data = final_data)
   
   # See estimates for fixed and random effects and test hypotheses about group differences
   print(paste("Model using", score_column, "as EF"))

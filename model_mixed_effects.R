@@ -1,11 +1,13 @@
 # install.packages("ggplot2")
 # install.packages("tidyr")
 # install.packages("lme4")
+# install.packages("lmerTest")
 
 library(ggplot2)
 library(tidyr)
 library(lme4)
 library(dplyr)
+library(lmerTest)
 
 rm(list = ls())
 
@@ -18,6 +20,9 @@ ibis_behav$DCCS_Standard_Age_Corrected[ibis_behav$DCCS_Standard_Age_Corrected ==
 
 # Remove rows with no Group
 ibis_behav_filtered <- ibis_behav[!is.na(ibis_behav$Group), ]
+
+# Remove LR+ group
+ibis_behav_filtered <- ibis_behav_filtered %>% filter(Group != "LR+")
 
 # Convert Group and Sex to factors
 ibis_behav_filtered$Sex <- factor(ibis_behav_filtered$Sex)

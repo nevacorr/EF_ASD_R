@@ -23,7 +23,7 @@ fit_linear_mixed_effects_model <- function(score_column, data) {
   # Create a model that relates School Age EF Score to EF scores at 12 and 24 months, takes sex and group into account
   # and includes subject as random factor
   # model <- lmer(Score ~ Sex + Group + Time + Age_SchoolAge + (1 | Identifiers), data = final_data)
-  model <- lmer(Score ~ Sex + Group * Time + (1 | Identifiers), data = final_data)
+  model <- lmer(Score ~ Sex + Group + Time + Group * Time + (1 | Identifiers), data = final_data)
   
   # See estimates for fixed and random effects and test hypotheses about group differences
   print(paste("Model using", score_column, "as EF"))

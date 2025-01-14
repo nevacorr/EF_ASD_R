@@ -2,6 +2,29 @@
 plot_model_with_age_by_group <- function(result, score_column) {
   final_data <- result$final_data
   model <- result$model
+
+  # Plot actual data and lines connected data from the same subject
+  plot <- ggplot(final_data, aes(x = Time, y = Score)) + 
+      # geom_point(aes(color = Group)) + # Observed scores
+      geom_line(aes(group = Identifiers, color = Group)) +
+      labs(title = paste("Raw Scores by Group and Age\n(", score_column, "Used for School Age Score", sep = ""),
+          x= 'Time',
+          y = 'Score') +
+      theme_minimal() + 
+      theme(
+        legend.position = "right",
+        panel.grid = element_blank(),  # Remove grid lines
+        axis.text.x = element_text(size = 11),   # Set x-axis tick label size
+        axis.text.y = element_text(size = 11),    # Set y-axis tick label size
+        legend.text = element_text(size = 11),    # Set legend label font size
+        axis.title.x = element_text(size = 12),  # Set x-axis label font size
+        axis.title.y = element_text(size = 12),   # Set y-axis label font size
+        legend.title = element_text(size = 12)   # Set legend label font size
+     )
+      
+  print(plot)
+  
+  browser()    
   
   # Get predicted values from the model for each age
   final_data$predicted_score <- predict(model, newdata = final_data)

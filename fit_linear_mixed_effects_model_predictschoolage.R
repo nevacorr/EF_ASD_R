@@ -11,8 +11,6 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) 
   data_filtered <- data_filtered0 %>%
     filter(!is.na(AB_12_Percent) & !is.na(AB_24_Percent))
   
-  browser()
-  
   # Keep only columns that will be used in modeling
   final_data <- data_filtered[, c("Identifiers", "Group", "Sex", "AB_12_Percent", "AB_24_Percent", "Risk", score_column)]
 

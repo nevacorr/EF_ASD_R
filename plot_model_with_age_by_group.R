@@ -8,15 +8,21 @@ plot_model_with_age_by_group <- function(result, score_column) {
   
   # Plot actual and predicted data for each subject individually
   plot <- ggplot(final_data, aes(x = Time, y = Score, color = Group, group = interaction(Group, Identifiers))) +
-    geom_point(alpha = 0.6, size = 1, position = position_jitter(width = 0.2)) +  # Observed scores
-    geom_line(aes(y = predicted_score), size = 0.2) +                              # Predicted scores
+    geom_point(alpha = 0.6, size = 1) +  # Observed scores
+    geom_line(aes(y = predicted_score), size = 0.2) + # Predicted scores
     labs(title = paste("Model of Scores by Group and Age\n(", score_column, " Used for School Age Score)", sep = ""),
          x = "Time",
          y = "Score") +
     theme_minimal() +
     theme(
-      legend.position = "bottom",
-      panel.grid = element_blank()  # Remove grid lines
+      legend.position = "right",
+      panel.grid = element_blank(),  # Remove grid lines
+      axis.text.x = element_text(size = 11),   # Set x-axis tick label size
+      axis.text.y = element_text(size = 11),    # Set y-axis tick label size
+      legend.text = element_text(size = 11),    # Set legend label font size
+      axis.title.x = element_text(size = 12),  # Set x-axis label font size
+      axis.title.y = element_text(size = 12),   # Set y-axis label font size
+      legend.title = element_text(size = 12)   # Set legend label font size
           )
   
   print(plot)

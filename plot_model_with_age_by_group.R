@@ -3,10 +3,6 @@ plot_model_with_age_by_group <- function(result, score_column) {
   final_data <- result$final_data
   model <- result$model
   
-  # Debugging: Check column names
-  print("Available columns in final_data:")
-  print(colnames(final_data))
-  
   # Get predicted values from the model for each age
   final_data$predicted_score <- predict(model, newdata = final_data)
   

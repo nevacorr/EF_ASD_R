@@ -1,5 +1,5 @@
 
-fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) {
+fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data, standardize) {
   
   # Remove rows with no school age score
   data_filtered0 <- data[!is.na(data[[score_column]]), ]
@@ -15,9 +15,7 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) 
   final_data <- data_filtered[, c("Identifiers", "Group", "Sex", "AB_12_Percent", "AB_24_Percent", "Risk", score_column)]
 
   final_data$Sex <- factor(final_data$Sex)
-  
-  # browser()
-  
+
   # Create a model that relates School Age EF Score to EF scores at 12 and 24 months, takes sex and group into account
   # and includes subject as random factor
   
@@ -61,7 +59,7 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) 
   correlation12 <- cor(final_data$AB_12_Percent, final_data[[score_column]])
   # Scatter plot 
   p1 <- ggplot(data = final_data, aes(x = AB_12_Percent, y = .data[[score_column]])) +
-    geom_point() +  # Add points to the plot
+    geom_point(aes(color=Group)) +  # Add points to the plot
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     labs(
       title = paste("Scatter plot of EF 12 mo vs", score_column, "\nCorrelation: ", round(correlation12, 2)),
@@ -72,7 +70,7 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) 
   correlation24 <- cor(final_data$AB_24_Percent, final_data[[score_column]])
   # Scatter plot 
   p2 <- ggplot(data = final_data, aes(x = AB_24_Percent, y = .data[[score_column]])) +
-    geom_point() +  # Add points to the plot
+    geom_point(aes(color=Group)) +  # Add points to the plot
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     labs(
       title = paste("Scatter plot of EF 24 mo vs", score_column, "\nCorrelation: ", round(correlation24, 2)),
@@ -83,4 +81,14 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data) 
   print(p1)
   print(p2)
   
+  # Save plots to file
+  if (standardize == 1) {
+    ggsave(paste("Standardized Data Correlation_RawAB12mo vs", score_column, ".png"), plot = p1, dpi = 300, bg="white")
+    ggsave(paste("Standardized Data Correlation_RawAB24mo vs", score_column, ".png"), plot = p2, dpi = 300, bg="white")
+  } else {
+    ggsave(paste("Correlation_RawAB12mo vs", score_column, ".png"), plot = p1, dpi = 300, bg="white")
+    ggsave(paste("Correlation_RawAB24mo vs", score_column, ".png"), plot = p2, dpi = 300, bg="white")   
+  }
+    
+    
 }

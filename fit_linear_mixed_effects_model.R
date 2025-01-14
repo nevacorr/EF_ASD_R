@@ -1,5 +1,5 @@
 
-fit_linear_mixed_effects_model <- function(score_column, data) {
+fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
   
   # Reshape the data from wide to long format
   long_data <- data %>%
@@ -26,6 +26,9 @@ fit_linear_mixed_effects_model <- function(score_column, data) {
   
   # See estimates for fixed and random effects and test hypotheses about group differences
   print(paste("Model using", score_column, "as EF"))
+  if (standardize == 1) {
+    print("All Scores Converted to Z Scores")
+  }
   print(summary(model))
   print(anova(model))
   

@@ -1,13 +1,19 @@
 
-plot_model_with_age_by_group <- function(result, score_column) {
+plot_model_with_age_by_group <- function(result, score_column, standardize) {
   final_data <- result$final_data
   model <- result$model
 
+  if (standardize == 1) {
+    title <- paste("Standardized Raw Scores by Group and Age\n", score_column, "Used for School Age Score", sep = "")
+  } else {
+    title <- paste("Raw Scores by Group and Age\n", score_column, "Used for School Age Score", sep = "")
+  }
+  
   # Plot actual data and lines connected data from the same subject
   plot <- ggplot(final_data, aes(x = Time, y = Score)) + 
       geom_point(aes(color = Group), alpha = 0.6, size = 1) + # Observed scores
       geom_line(aes(group = Identifiers, color = Group)) +
-      labs(title = paste("Raw Scores by Group and Age\n(", score_column, "Used for School Age Score", sep = ""),
+      labs(title = title,
           x= 'Time',
           y = 'Score') +
       theme_minimal() + 
@@ -25,8 +31,12 @@ plot_model_with_age_by_group <- function(result, score_column) {
   print(plot)
   
   # Save plot to file
-  ggsave(paste("Raw Scores by Group and Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
-
+  if (standardize == 1) {
+    ggsave(paste("Standardized Raw Scores by Group and Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
+  } else {
+    ggsave(paste("Raw Scores by Group and Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
+  }
+  
   # Get predicted values from the model for each age
   final_data$predicted_score <- predict(model, newdata = final_data)
   
@@ -85,5 +95,10 @@ plot_model_with_age_by_group <- function(result, score_column) {
   print(plot)
   
   # Save plot to file
-  ggsave(paste("Model of Scores by Group and Age", score_column, " Used for School Age Score.png"), plot = plot, dpi = 300, bg="white")
-}
+  if (standardize == 1) {
+    ggsave(paste("Model of Standardized Scores by Group and Age", score_column, " Used for School Age Score.png"), plot = plot, dpi = 300, bg="white")
+  } else {
+    ggsave(paste("Model of Scores by Group and Age", score_column, " Used for School Age Score.png"), plot = plot, dpi = 300, bg="white")
+  }
+  
+  }

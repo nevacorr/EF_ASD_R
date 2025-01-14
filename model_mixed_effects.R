@@ -9,9 +9,23 @@ library(lme4)
 library(dplyr)
 library(lmerTest)
 
+standardize <= 1
+
 rm(list = ls())
 
 ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS.csv"))
+
+if (standardize == 1) {
+  # Manually calculate z-scores for 12mo, 24mo and school age columns
+  ibis_behav$AB_12_Percent <- (ibis_behav$AB_12_Percent -
+                               mean(ibis_behav$AB_12_Percent, na.rm = TRUE)) / sd(ibis_behav$AB_12_Percent, na.rm = TRUE)
+  ibis_behav$AB_24_Percent <- (ibis_behav$AB_24_Percent -
+                               mean(ibis_behav$AB_24_Percent, na.rm = TRUE)) / sd(ibis_behav$AB_24_Percent, na.rm = TRUE)
+  ibis_behav$Flanker_Standard_Age_Corrected <- (ibis_behav$Flanker_Standard_Age_Corrected -
+                               mean(ibis_behav$Flanker_Standard_Age_Corrected, na.rm = TRUE)) / sd(ibis_behav$Flanker_Standard_Age_Corrected, na.rm = TRUE)
+  ibis_behav$DCCS_Standard_Age_Corrected <- (ibis_behav$DCCS_Standard_Age_Corrected -
+                                                  mean(ibis_behav$DCCS_Standard_Age_Corrected, na.rm = TRUE)) / sd(ibis_behav$DCCS_Standard_Age_Corrected, na.rm = TRUE)
+}
 
 # Convert empty strings in Group column to NA 
 ibis_behav$Group[ibis_behav$Group == ""] <- NA  
@@ -34,18 +48,21 @@ ibis_behav_filtered$Group <- relevel(ibis_behav_filtered$Group, ref = "LR-")
 
 source("fit_linear_mixed_effects_model.R")
 
-result_flanker1 <- fit_linear_mixed_effects_model("Flanker_Standard_Age_Corrected", ibis_behav_filtered)
-result_dccs1 <- fit_linear_mixed_effects_model("DCCS_Standard_Age_Corrected", ibis_behav_filtered)
+result_flanker1 <- fit_linear_mixed_effects_model("Flanker_Standard_Age_Corrected", ibis_behav_filtered, standardize)
+result_dccs1 <- fit_linear_mixed_effects_model("DCCS_Standard_Age_Corrected", ibis_behav_filtered, standardize)
 
 source("plot_model_with_age_by_group.R")
 
-plot_model_with_age_by_group(result_flanker1, "Flanker_Standard_Age_Corrected")
-plot_model_with_age_by_group(result_dccs1, "DCCS_Standard_Age_Corrected")
+plot_model_with_age_by_group(result_flanker1, "Flanker_Standard_Age_Corrected", standardize)
+plot_model_with_age_by_group(result_dccs1, "DCCS_Standard_Age_Corrected", standardize)
 
 source("fit_linear_mixed_effects_model_predictschoolage.R")
 
-result_flanker <- fit_linear_mixed_effects_model_predictschoolage("Flanker_Standard_Age_Corrected", ibis_behav_filtered)
-result_dccs <- fit_linear_mixed_effects_model_predictschoolage("DCCS_Standard_Age_Corrected", ibis_behav_filtered)
+result_flanker <- fit_linear_mixed_effects_model_predictschoolage("Flanker_Standard_Age_Corrected", ibis_behav_filtered, standardize)
+result_dccs <- fit_linear_mixed_effects_model_predictschoolage("DCCS_Standard_Age_Corrected", ibis_behav_filtered, standardize)
+
+
+
 
 
 

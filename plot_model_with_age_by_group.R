@@ -5,7 +5,7 @@ plot_model_with_age_by_group <- function(result, score_column) {
 
   # Plot actual data and lines connected data from the same subject
   plot <- ggplot(final_data, aes(x = Time, y = Score)) + 
-      # geom_point(aes(color = Group)) + # Observed scores
+      geom_point(aes(color = Group)) + # Observed scores
       geom_line(aes(group = Identifiers, color = Group)) +
       labs(title = paste("Raw Scores by Group and Age\n(", score_column, "Used for School Age Score", sep = ""),
           x= 'Time',

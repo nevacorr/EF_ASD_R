@@ -6,7 +6,7 @@ plot_model_with_age_by_group <- function(result, score_column) {
   # Get predicted values from the model for each age
   final_data$predicted_score <- predict(model, newdata = final_data)
   
-  # Plot the predicted scores by Group and Time (with 12_months, 24_months, school_age on the x-axis)
+  # Plot the model by Group and Time (with 12_months, 24_months, school_age on the x-axis)
   plot <- ggplot(final_data, aes(x = Time, color = Group, group = Group)) +
     geom_line(aes(y = predicted_score, linetype = Group), size = 1) +  # Line for predicted scores
     # geom_point(aes(y = Score), size = 2, shape = 21, fill = "white") +  # Scatterplot of real data

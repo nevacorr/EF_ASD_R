@@ -23,9 +23,7 @@ plot_model_with_age_by_group <- function(result, score_column) {
      )
       
   print(plot)
-  
-  browser()    
-  
+
   # Get predicted values from the model for each age
   final_data$predicted_score <- predict(model, newdata = final_data)
   

@@ -56,13 +56,21 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data, 
   
   print(summary(model6))
   
+  if (standardize == 1) {
+    title12 = paste("Scatter plot of Standardized EF 12 mo vs", score_column, "\nCorrelation: ", round(correlation12, 2))
+    title24 = paste("Scatter plot of Standardized EF 24 mo vs", score_column, "\nCorrelation: ", round(correlation24, 2))
+  } else {
+    title12 = paste("Scatter plot of EF 12 mo vs", score_column, "\nCorrelation: ", round(correlation12, 2))
+    title24 = paste("Scatter plot of EF 24 mo vs", score_column, "\nCorrelation: ", round(correlation24, 2))
+  }
+  
   correlation12 <- cor(final_data$AB_12_Percent, final_data[[score_column]])
   # Scatter plot 
   p1 <- ggplot(data = final_data, aes(x = AB_12_Percent, y = .data[[score_column]])) +
     geom_point(aes(color=Group)) +  # Add points to the plot
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     labs(
-      title = paste("Scatter plot of EF 12 mo vs", score_column, "\nCorrelation: ", round(correlation12, 2)),
+      title = title12, 
       x = "EF 12mo", 
       y = "EF School Age") +
     theme_minimal()
@@ -73,7 +81,7 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data, 
     geom_point(aes(color=Group)) +  # Add points to the plot
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     labs(
-      title = paste("Scatter plot of EF 24 mo vs", score_column, "\nCorrelation: ", round(correlation24, 2)),
+      title = title24,
       x = "EF 24mo", 
       y = "EF School Age") +
     theme_minimal()
@@ -82,13 +90,9 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data, 
   print(p2)
   
   # Save plots to file
-  if (standardize == 1) {
-    ggsave(paste("Standardized Data Correlation_RawAB12mo vs", score_column, ".png"), plot = p1, dpi = 300, bg="white")
-    ggsave(paste("Standardized Data Correlation_RawAB24mo vs", score_column, ".png"), plot = p2, dpi = 300, bg="white")
-  } else {
-    ggsave(paste("Correlation_RawAB12mo vs", score_column, ".png"), plot = p1, dpi = 300, bg="white")
-    ggsave(paste("Correlation_RawAB24mo vs", score_column, ".png"), plot = p2, dpi = 300, bg="white")   
-  }
+  ggsave(paste(title12, "_", score_column, ".png"), plot = p1, dpi = 300, bg="white")
+  ggsave(paste(title24, "_", score_column, ".png"), plot = p2, dpi = 300, bg="white")
+
     
     
 }

@@ -56,6 +56,9 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data, 
   
   print(summary(model6))
   
+  correlation12 <- cor(final_data$AB_12_Percent, final_data[[score_column]])
+  correlation24 <- cor(final_data$AB_24_Percent, final_data[[score_column]])
+  
   if (standardize == 1) {
     title12 = paste("Scatter plot of Standardized EF 12 mo vs", score_column, "\nCorrelation: ", round(correlation12, 2))
     title24 = paste("Scatter plot of Standardized EF 24 mo vs", score_column, "\nCorrelation: ", round(correlation24, 2))
@@ -63,8 +66,7 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data, 
     title12 = paste("Scatter plot of EF 12 mo vs", score_column, "\nCorrelation: ", round(correlation12, 2))
     title24 = paste("Scatter plot of EF 24 mo vs", score_column, "\nCorrelation: ", round(correlation24, 2))
   }
-  
-  correlation12 <- cor(final_data$AB_12_Percent, final_data[[score_column]])
+
   # Scatter plot 
   p1 <- ggplot(data = final_data, aes(x = AB_12_Percent, y = .data[[score_column]])) +
     geom_point(aes(color=Group)) +  # Add points to the plot
@@ -75,7 +77,6 @@ fit_linear_mixed_effects_model_predictschoolage <- function(score_column, data, 
       y = "EF School Age") +
     theme_minimal()
   
-  correlation24 <- cor(final_data$AB_24_Percent, final_data[[score_column]])
   # Scatter plot 
   p2 <- ggplot(data = final_data, aes(x = AB_24_Percent, y = .data[[score_column]])) +
     geom_point(aes(color=Group)) +  # Add points to the plot

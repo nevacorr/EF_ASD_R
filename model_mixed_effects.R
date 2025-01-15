@@ -47,6 +47,28 @@ ibis_behav_filtered$Identifiers <- factor(ibis_behav_filtered$Identifiers)
 # Set 'GroupLR-' as the reference level
 ibis_behav_filtered$Group <- relevel(ibis_behav_filtered$Group, ref = "LR-")
 
+# Count occurrences in the Group column
+counts <- ibis_behav_filtered %>%
+  count(Group)
+
+print(counts)
+
+# Plot histogram of counts
+ggplot(ibis_behav_filtered, aes(x = Group)) +
+  geom_bar(fill = "skyblue", color = "black") +  # `geom_bar()` is used for categorical data
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +  # Add labels above bars
+  labs(title = "Number of Subjects in each Group",
+       x = "Group",
+       y = "Number of Subjects") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size=25),
+    panel.grid = element_blank(),  # Remove grid lines
+    axis.text.x = element_text(size = 18),   # Set x-axis tick label size
+    axis.text.y = element_text(size = 18),    # Set y-axis tick label size
+    axis.title.x = element_text(size = 20),  # Set x-axis label font size
+    axis.title.y = element_text(size = 20),   # Set y-axis label font size
+)
 source("fit_linear_mixed_effects_model.R")
 
 result_flanker1 <- fit_linear_mixed_effects_model("Flanker_Standard_Age_Corrected", ibis_behav_filtered, standardize)

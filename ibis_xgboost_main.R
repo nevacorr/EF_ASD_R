@@ -1,13 +1,13 @@
-# install.packages("ggplot2")
-# install.packages("tidyr")
-# install.packages("lme4")
-# install.packages("lmerTest")
+# install.packages("xgboost")
+# install.packages("caTools")
+# install.packages("cvms")
+# install.packages("caret")
 
-library(ggplot2)
-library(tidyr)
-library(lme4)
+library(xgboost)
+library(caTools)
+library(cvms)
 library(dplyr)
-library(lmerTest)
+library(caret)
 
 rm(list = ls())
 

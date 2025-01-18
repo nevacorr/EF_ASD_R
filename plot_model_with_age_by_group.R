@@ -68,6 +68,7 @@ plot_model_with_age_by_group <- function(result, score_column, standardize) {
               mean_observed_score = mean(Score),
               .groups = "drop")
   
+  
   # Plot group-level trends
   library(ggplot2)
   

@@ -6,6 +6,17 @@ rm(list = ls())
 # Load data
 ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS.csv"))
 
+standardize <- 0 # Indicate whether to convert EF scores to Z scores
+
+if (standardize == 1) {
+  # Calculate z-scores for scores
+  ibis_behav$Flanker_Standard_Age_Corrected <- (ibis_behav$Flanker_Standard_Age_Corrected -
+                                                  mean(ibis_behav$Flanker_Standard_Age_Corrected, na.rm = TRUE)) / sd(ibis_behav$Flanker_Standard_Age_Corrected, na.rm = TRUE)
+  ibis_behav$DCCS_Standard_Age_Corrected <- (ibis_behav$DCCS_Standard_Age_Corrected -
+                                               mean(ibis_behav$DCCS_Standard_Age_Corrected, na.rm = TRUE)) / sd(ibis_behav$DCCS_Standard_Age_Corrected, na.rm = TRUE)
+}
+
+
 # Remove all but columns to keep
 flanker_df <-ibis_behav %>% select(c("Group", "Flanker_Standard_Age_Corrected"))
 dccs_df <-ibis_behav %>% select(c("Group", "DCCS_Standard_Age_Corrected"))
@@ -55,6 +66,20 @@ cat('\nTukey results for Flanker')
 print(flanker_tukey_result)
 cat('\nTukey results for DCCS')
 print(dccs_tukey_result)
+
+# Boxplot
+boxplot(Flanker_Standard_Age_Corrected ~ Group, data = flanker_df_clean,
+        main = "School Age Data: Flanker Score by Group",
+        xlab = "Group",
+        ylab = "Score",
+        col = c("skyblue", "lightgreen", "pink"))
+
+# Boxplot
+boxplot(DCCS_Standard_Age_Corrected ~ Group, data = dccs_df_clean,
+        main = "School Age Data: DCCS Score by Group",
+        xlab = "Group",
+        ylab = "Score",
+        col = c("skyblue", "lightgreen", "pink"))
 
 mystop=1
 

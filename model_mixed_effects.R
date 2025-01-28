@@ -17,8 +17,6 @@ ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBI
 
 # Convert empty strings in some columns to NA 
 ibis_behav$Group[ibis_behav$Group == ""] <- NA  
-# ibis_behav$Flanker_Standard_Age_Corrected[ibis_behav$Flanker_Standard_Age_Corrected == ""] <- NA
-# ibis_behav$DCCS_Standard_Age_Corrected[ibis_behav$DCCS_Standard_Age_Corrected == ""] <- NA
 
 if (standardize == 1) {
   # Manually calculate z-scores for 12mo, 24mo and school age columns

@@ -14,8 +14,12 @@ fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
       Time == score_column ~ "school_age"
     ))
   
+  browser()
+  
   long_data_cleaned <- long_data %>%
    filter(!is.na(Score))  # Remove rows with missing scores
+  
+  browser()
   
   # Keep only columns that will be used in modeling
   final_data <- long_data_cleaned[, c("Identifiers", "Group", "Sex", "Age_SchoolAge", "Time", "Score")]

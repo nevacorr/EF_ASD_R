@@ -18,12 +18,13 @@ fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
    filter(!is.na(Score))  # Remove rows with missing scores
   
   # Keep only columns that will be used in modeling
-  final_data <- long_data_cleaned[, c("Identifiers", "Group", "Sex", "Age_SchoolAge", "Time", "Score")]
+  final_data <- long_data_cleaned[, c("Identifiers", "Group", "Sex", "Time", "Score")]
   
   counts <- final_data %>%
     group_by(Time, Group) %>%
     summarise(Count = n(), .groups = "drop")
  
+  print('Number of Subjects Per Age Point')
   print(counts)
   
   # Create a model that relates scores at all ages to group and time point, takes sex into account

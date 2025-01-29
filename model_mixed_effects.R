@@ -15,6 +15,9 @@ standardize <- 1 # Indicate whether to convert EF scores to Z scores
 
 ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS.csv"))
 
+# Remove duplicate rows
+ibis_behav <- ibis_behav[!duplicated(ibis_behav$Identifiers), ]
+
 # Convert empty strings in Group column to NA 
 ibis_behav$Group[ibis_behav$Group == ""] <- NA  
 

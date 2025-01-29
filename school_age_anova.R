@@ -6,6 +6,8 @@ rm(list = ls())
 # Load data
 ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS.csv"))
 
+ibis_behav <- ibis_behav_orig[!duplicated(ibis_behav_orig$Identifiers), ]
+
 standardize <- 0 # Indicate whether to convert EF scores to Z scores
 
 if (standardize == 1) {

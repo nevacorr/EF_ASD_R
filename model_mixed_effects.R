@@ -15,7 +15,7 @@ standardize <- 1 # Indicate whether to convert EF scores to Z scores
 
 ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS.csv"))
 
-# Convert empty strings in some columns to NA 
+# Convert empty strings in Group column to NA 
 ibis_behav$Group[ibis_behav$Group == ""] <- NA  
 
 if (standardize == 1) {

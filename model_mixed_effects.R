@@ -11,7 +11,7 @@ library(lmerTest)
 
 rm(list = ls())
 
-standardize <- 1 # Indicate whether to convert EF scores to Z scores
+standardize <- 0 # Indicate whether to convert EF scores to Z scores
 
 ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS.csv"))
 
@@ -74,25 +74,25 @@ source("fit_linear_mixed_effects_model.R")
 
 result_flanker1 <- fit_linear_mixed_effects_model("Flanker_Standard_Age_Corrected", ibis_behav_filtered, standardize)
 result_dccs1 <- fit_linear_mixed_effects_model("DCCS_Standard_Age_Corrected", ibis_behav_filtered, standardize)
-if (standardize ==1) {
-  result_combined <- fit_linear_mixed_effects_model("Average_Flanker_DCCS", ibis_behav_filtered, standardize)
-}
+# if (standardize ==1) {
+#   result_combined <- fit_linear_mixed_effects_model("Average_Flanker_DCCS", ibis_behav_filtered, standardize)
+# }
 
 source("plot_model_with_age_by_group.R")
 
 plot_model_with_age_by_group(result_flanker1, "Flanker_Standard_Age_Corrected", standardize)
 plot_model_with_age_by_group(result_dccs1, "DCCS_Standard_Age_Corrected", standardize)
-if (standardize ==1) {
-  plot_model_with_age_by_group(result_combined, "Average_Flanker_DCCS", standardize)
-}
+#if (standardize ==1) {
+ # plot_model_with_age_by_group(result_combined, "Average_Flanker_DCCS", standardize)
+#}
 
 source("fit_linear_mixed_effects_model_predictschoolage.R")
 
 result_flanker <- fit_linear_mixed_effects_model_predictschoolage("Flanker_Standard_Age_Corrected", ibis_behav_filtered, standardize)
 result_dccs <- fit_linear_mixed_effects_model_predictschoolage("DCCS_Standard_Age_Corrected", ibis_behav_filtered, standardize)
-if (standardize ==1) {
-  result_combined <- fit_linear_mixed_effects_model_predictschoolage("Average_Flanker_DCCS", ibis_behav_filtered, standardize)
-}
+#if (standardize ==1) {
+  #result_combined <- fit_linear_mixed_effects_model_predictschoolage("Average_Flanker_DCCS", ibis_behav_filtered, standardize)
+#}
 
 
 

@@ -11,9 +11,9 @@ library(lmerTest)
 
 rm(list = ls())
 
-standardize <- 0 # Indicate whether to convert EF scores to Z scores
+standardize <- 1 # Indicate whether to convert EF scores to Z scores
 
-ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS.csv"))
+ibis_behav <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2.csv"))
 
 # Remove duplicate rows
 ibis_behav <- ibis_behav[!duplicated(ibis_behav$Identifiers), ]
@@ -31,7 +31,8 @@ if (standardize == 1) {
                                mean(ibis_behav$Flanker_Standard_Age_Corrected, na.rm = TRUE)) / sd(ibis_behav$Flanker_Standard_Age_Corrected, na.rm = TRUE)
   ibis_behav$DCCS_Standard_Age_Corrected <- (ibis_behav$DCCS_Standard_Age_Corrected -
                                                   mean(ibis_behav$DCCS_Standard_Age_Corrected, na.rm = TRUE)) / sd(ibis_behav$DCCS_Standard_Age_Corrected, na.rm = TRUE)
-  ibis_behav$Average_Flanker_DCCS <- rowMeans(ibis_behav[, c("Flanker_Standard_Age_Corrected", "DCCS_Standard_Age_Corrected")])
+  ibis_behav$BRIEF2_GEC_T_score <- (ibis_behav$BRIEF2_GEC_T_score -
+                                                  mean(ibis_behav$BRIEF2_GEC_T_score, na.rm = TRUE)) / sd(ibis_behav$BRIEF2_GEC_T_score, na.rm = TRUE)
   }
 
 # Remove rows with no Group
@@ -54,45 +55,23 @@ counts <- ibis_behav_filtered %>%
 
 print(counts)
 
-# Plot histogram of counts
-ggplot(ibis_behav_filtered, aes(x = Group)) +
-  geom_bar(fill = "skyblue", color = "black") +  # `geom_bar()` is used for categorical data
-  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +  # Add labels above bars
-  labs(title = "Number of Subjects in each Group",
-       x = "Group",
-       y = "Number of Subjects") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size=25),
-    panel.grid = element_blank(),  # Remove grid lines
-    axis.text.x = element_text(size = 18),   # Set x-axis tick label size
-    axis.text.y = element_text(size = 18),    # Set y-axis tick label size
-    axis.title.x = element_text(size = 20),  # Set x-axis label font size
-    axis.title.y = element_text(size = 20),   # Set y-axis label font size
-)
 source("fit_linear_mixed_effects_model.R")
 
 result_flanker1 <- fit_linear_mixed_effects_model("Flanker_Standard_Age_Corrected", ibis_behav_filtered, standardize)
 result_dccs1 <- fit_linear_mixed_effects_model("DCCS_Standard_Age_Corrected", ibis_behav_filtered, standardize)
-# if (standardize ==1) {
-#   result_combined <- fit_linear_mixed_effects_model("Average_Flanker_DCCS", ibis_behav_filtered, standardize)
-# }
+result_brief2 <- fit_linear_mixed_effects_model("BRIEF2_GEC_T_score", ibis_behav_filtered, standardize)
 
 source("plot_model_with_age_by_group.R")
 
 plot_model_with_age_by_group(result_flanker1, "Flanker_Standard_Age_Corrected", standardize)
 plot_model_with_age_by_group(result_dccs1, "DCCS_Standard_Age_Corrected", standardize)
-#if (standardize ==1) {
- # plot_model_with_age_by_group(result_combined, "Average_Flanker_DCCS", standardize)
-#}
+plot_model_with_age_by_group(result_brief2, "BRIEF2_GEC_T_score", standardize)
 
-source("fit_linear_mixed_effects_model_predictschoolage.R")
+#source("fit_linear_mixed_effects_model_predictschoolage.R")
 
-result_flanker <- fit_linear_mixed_effects_model_predictschoolage("Flanker_Standard_Age_Corrected", ibis_behav_filtered, standardize)
-result_dccs <- fit_linear_mixed_effects_model_predictschoolage("DCCS_Standard_Age_Corrected", ibis_behav_filtered, standardize)
-#if (standardize ==1) {
-  #result_combined <- fit_linear_mixed_effects_model_predictschoolage("Average_Flanker_DCCS", ibis_behav_filtered, standardize)
-#}
+#result_flanker <- fit_linear_mixed_effects_model_predictschoolage("Flanker_Standard_Age_Corrected", ibis_behav_filtered, standardize)
+#result_dccs <- fit_linear_mixed_effects_model_predictschoolage("DCCS_Standard_Age_Corrected", ibis_behav_filtered, standardize)
+
 
 
 

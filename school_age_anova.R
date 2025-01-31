@@ -1,5 +1,7 @@
+# install.packages("car")
 
 library(dplyr)
+library(car)
 
 rm(list = ls())
 
@@ -20,7 +22,6 @@ if (standardize == 1) {
   ibis_behav$BRIEF2_GEC_T_score <- (ibis_behav$BRIEF2_GEC_T_score -
                                                mean(ibis_behav$BRIEF2_GEC_T_score, na.rm = TRUE)) / sd(ibis_behav$BRIEF2_GEC_T_score, na.rm = TRUE)
   }
-
 
 # Remove all but columns to keep
 flanker_df <-ibis_behav %>% select(c("Group", "Flanker_Standard_Age_Corrected"))
@@ -106,5 +107,22 @@ boxplot(BRIEF2_GEC_T_score ~ Group, data = brief2_df_clean,
         ylab = "Score",
         col = c("skyblue", "lightgreen", "pink"))
 
-mystop=1
+source("Utility_Functions.R")
 
+# Plot histograms of data
+plot_histogram(flanker_df_clean, "Flanker_Standard_Age_Corrected")
+plot_histogram(dccs_df_clean, "DCCS_Standard_Age_Corrected")
+plot_histogram(brief2_df_clean, "BRIEF2_GEC_T_score")
+
+# Test for normality of anova residuals
+plot_qq(flanker_anova_result, "Flanker School Age")
+plot_qq(dccs_anova_result, "DCCS School Age")
+plot_qq(brief2_anova_result, "Brief2 GEC T-score")
+
+# Test for equal variances using Levene's test
+flanker_levene_result <- leveneTest(Flanker_Standard_Age_Corrected ~ Group, data = flanker_df_clean)
+print(flanker_levene_result)
+dccs_levene_result <- leveneTest(DCCS_Standard_Age_Corrected ~ Group, data = dccs_df_clean)
+print(dccs_levene_result)
+brief2_levene_result <- leveneTest(BRIEF2_GEC_T_score ~ Group, data = brief2_df_clean)
+print(brief2_levene_result)

@@ -1,7 +1,13 @@
 
+install.packages(emmeans)
+install.packages(forcats)
+install.packages(ggplot2)
+
 library(dplyr)
 library(tidyr)
 library(lme4)
+library(emmeans)
+library(forcats)
 
 rm(list = ls())
 
@@ -82,6 +88,9 @@ z_normative_df <- z_normative_df %>%
     AB_24_Percent = AB_24_Percent_z_score_norm,
     BRIEF2_GEC_T_score = BRIEF2_GEC_T_score_z_score_norm
   )
+# For the Brief2 GEC score, higher values indicate more difficulty with EF
+# Flip the sign of the Brief2 column
+z_normative_df$BRIEF2_GEC_T_score <- -z_normative_df$BRIEF2_GEC_T_score
 
 # Convert empty strings in Group column to NA 
 z_normative_df$Group[z_normative_df$Group == ""] <- NA

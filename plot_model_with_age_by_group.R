@@ -2,7 +2,10 @@
 plot_model_with_age_by_group <- function(result, score_column, standardize) {
   final_data <- result$final_data
   model <- result$model
-
+  
+  final_data <- final_data %>%
+    mutate(Time = fct_relevel(Time, "12_months", "24_months", "school_age"))
+  
   if (standardize == 1) {
     title <- paste("Standardized Raw Scores by Group and Age\n", score_column, "Used for School Age Score", sep = "")
   } else {
@@ -66,8 +69,12 @@ plot_model_with_age_by_group <- function(result, score_column, standardize) {
     group_by(Group, Time) %>%
     summarize(mean_predicted_score = mean(predicted_score),
               mean_observed_score = mean(Score),
-              .groups = "drop")
+              .groups = "drop") %>%
+    mutate(Time = factor(Time, levels = c("12_months", "24_months", "school_age")))  # Ensure correct order
   
+  
+  group_summary <- group_summary %>%
+    mutate(Time = fct_relevel(Time, "12_months", "24_months", "school_age"))
   
   # Plot group-level trends
   library(ggplot2)

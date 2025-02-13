@@ -6,3 +6,4 @@
 *.pptx
 *.csv
 *.Rproj
+.DS_Store

@@ -36,3 +36,25 @@ plot_qq <- function(anova_result, title_text) {
   qqline(residuals(anova_result), col = "red") 
 }
 
+remove_bad_quality_data <- function(df) {
+  
+  df[df == "."] <- NA
+  
+  qc_cols <- grep("_PassFail$", names(df), value = TRUE)
+  
+  region_substrings <- sub("_PassFail$", "", qc_cols)
+  
+  for (i in seq_along(qc_cols)) {
+    qc_col <- qc_cols[i]
+    region_matches <- grep(region_substrings[i], names(df), value = TRUE)
+    
+    for (region_col in region_matches) {
+      df[[region_col]][df[[qc_col]] == "Fail"] <- NA
+    }
+  }
+  
+  df <- df[, !names(df) %in% qc_cols]
+  
+  # Remove columns that contain "VQC" or "Exclude_Reason"
+  df <- df[, !grepl("VQC|Exclude_Reason|Visit", colnames(df))]
+}

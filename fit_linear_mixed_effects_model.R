@@ -31,7 +31,7 @@ fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
   final_data$Time <- factor(final_data$Time)
   
   # Set 'school_age' as the reference level
-  final_data$Time <- relevel(final_data$Time, ref = "school_age")
+  # final_data$Time <- relevel(final_data$Time, ref = "school_age")
   
   # Create a model that relates scores at all ages to group and time point, takes sex into account
   # and includes subject as random factor
@@ -39,8 +39,11 @@ fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
   
   emm <- emmeans(model, pairwise ~ Group | Time, adjust = "tukey")
   
+  print(score_column)
   print("emm")
   print(emm)
+  print(score_column)
+  browser()
   
   # See estimates for fixed and random effects and test hypotheses about group differences
   print(paste("Model using", score_column, "as EF"))

@@ -8,6 +8,7 @@ library(tidyr)
 library(lme4)
 library(dplyr)
 library(lmerTest)
+library(emmeans)
 
 rm(list = ls())
 

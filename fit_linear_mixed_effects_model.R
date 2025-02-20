@@ -43,7 +43,6 @@ fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
   print("emm")
   print(emm)
   print(score_column)
-  browser()
   
   # See estimates for fixed and random effects and test hypotheses about group differences
   print(paste("Model using", score_column, "as EF"))

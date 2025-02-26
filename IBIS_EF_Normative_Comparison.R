@@ -16,7 +16,6 @@ ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source dat
 
 unique_duplicates <- names(table(ibis_behav_orig$Identifiers)[table(ibis_behav_orig$Identifiers) > 1])
 # Duplicates are UNC0013, UNC0041, UNC0147, UNC0154
-print(unique_duplicates)
 
 ibis_behav <- ibis_behav_orig[!duplicated(ibis_behav_orig$Identifiers), ]
 
@@ -31,9 +30,6 @@ clean_and_calculate_zscores <- function(df, column, group_name) {
   
   # Remove LR+ group
   df_clean <- df_clean %>% filter(Group != "LR+")
-  
-  # Set Group as a factor (categorical variable)
-  df_clean$Group <- as.factor(df_clean$Group)
 
   # Choose the data for the LR- group
   lr_data <- df_clean[df_clean$Group == group_name, ]
@@ -49,7 +45,7 @@ clean_and_calculate_zscores <- function(df, column, group_name) {
   return(df_clean)
 }
 
-# Apply the function to the dataframes
+# Make subset dataframes for scores
 flanker_df <- ibis_behav %>% select(Identifiers, Group, Flanker_Standard_Age_Corrected)
 dccs_df <- ibis_behav %>% select(Identifiers, Group, DCCS_Standard_Age_Corrected)
 ab12_df <- ibis_behav %>% select(Identifiers, Group, AB_12_Percent)
@@ -70,9 +66,10 @@ ab12_selected <- ab12_df_norm %>% select(Identifiers, ends_with("_z_score_norm")
 ab24_selected <- ab24_df_norm %>% select(Identifiers, ends_with("_z_score_norm"))
 brief2_selected <- brief2_df_norm %>% select(Identifiers, ends_with("_z_score_norm"))
 
+# Make a dataframe with just the demographic variables
 ibis_demo = ibis_behav %>% select(Identifiers, Group, Sex)
 
-# Merge them with the 'ibis' dataframe based on the Identifiers column
+# Merge behavior with the demographics dataframe based on the Identifiers column
 z_normative_df <- ibis_demo %>%
   left_join(flanker_selected, by = "Identifiers") %>%
   left_join(dccs_selected, by = "Identifiers") %>%
@@ -80,7 +77,7 @@ z_normative_df <- ibis_demo %>%
   left_join(ab24_selected, by = "Identifiers") %>%
   left_join(brief2_selected, by = "Identifiers")
 
-z_normative_df <- z_normative_df %>%
+z_normative_df <- z_normative_df %>% 
   rename(
     Flanker_Standard_Age_Corrected = Flanker_Standard_Age_Corrected_z_score_norm,
     DCCS_Standard_Age_Corrected = DCCS_Standard_Age_Corrected_z_score_norm,
@@ -88,6 +85,7 @@ z_normative_df <- z_normative_df %>%
     AB_24_Percent = AB_24_Percent_z_score_norm,
     BRIEF2_GEC_T_score = BRIEF2_GEC_T_score_z_score_norm
   )
+
 # For the Brief2 GEC score, higher values indicate more difficulty with EF
 # Flip the sign of the Brief2 column
 z_normative_df$BRIEF2_GEC_T_score <- -z_normative_df$BRIEF2_GEC_T_score
@@ -116,9 +114,7 @@ contrasts(z_normative_df$Group) <- contr.sum(length(levels(z_normative_df$Group)
 # print coding
 print(contrasts(z_normative_df$Group))
 
-# Convert Identifiers,  Group,  Sex to factors
-# z_normative_df$Sex <- factor(z_normative_df$Sex)
-# z_normative_df$Group <- factor(z_normative_df$Group)
+# Convert Identifiers to factor
 z_normative_df$Identifiers <- factor(z_normative_df$Identifiers)
 
 # Set 'GroupLR-' as the reference level
@@ -126,11 +122,10 @@ z_normative_df$Identifiers <- factor(z_normative_df$Identifiers)
 
 source("fit_linear_mixed_effects_model.R")
 
-standardize=0 # do not convert values to z scores
 print("Normative Z-score analysis")
-result_flanker = fit_linear_mixed_effects_model('Flanker_Standard_Age_Corrected', z_normative_df, standardize)
-result_dccs = fit_linear_mixed_effects_model('DCCS_Standard_Age_Corrected', z_normative_df, standardize)
-result_brief2 = fit_linear_mixed_effects_model('BRIEF2_GEC_T_score', z_normative_df, standardize)
+result_flanker = fit_linear_mixed_effects_model('Flanker_Standard_Age_Corrected', z_normative_df)
+result_dccs = fit_linear_mixed_effects_model('DCCS_Standard_Age_Corrected', z_normative_df)
+result_brief2 = fit_linear_mixed_effects_model('BRIEF2_GEC_T_score', z_normative_df)
 
 source("plot_model_with_age_by_group.R")
 

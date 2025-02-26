@@ -1,5 +1,5 @@
 
-fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
+fit_linear_mixed_effects_model <- function(score_column, data) {
   
   # Reshape the data from wide to long format
   long_data <- data %>%
@@ -9,22 +9,24 @@ fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
       values_to = "Score"
     ) 
   
+  # Remove columns for school age EF variables not to be modeled 
+  columns_to_keep <- c("Identifiers", "Group", "Sex", "Time", "Score")  # Specify columns to keep
+  long_data <- long_data %>% select(all_of(columns_to_keep))
+  
+  # Change name of score_column to school_age
   # Make time an ordered factor so it is interpreted chronologically
   long_data <- long_data %>%
     mutate(Time = recode(Time, !!score_column := "school_age")) %>%
     mutate(Time = factor(Time, levels = c("school_age", "AB_24_Percent", "AB_12_Percent")))
   
-  long_data_cleaned <- long_data %>%
+  final_data <- long_data %>%
    filter(!is.na(Score))  # Remove rows with missing scores
   
-  # Keep only columns that will be used in modeling
-  final_data <- long_data_cleaned[, c("Identifiers", "Group", "Sex", "Time", "Score")]
-  
   # Apply dummy coding to Time
-  contrasts(final_data$Time) <- contr.treatment(3, base=3)
+  # contrasts(final_data$Time) <- contr.treatment(3, base=3)
   
   # Apply effect coding to Time
-  # contrasts(final_data$Time) <- contr.sum(length(levels(final_data$Time)))
+  contrasts(final_data$Time) <- contr.sum(length(levels(final_data$Time)))
   
   # print coding
   print(contrasts(final_data$Time))
@@ -42,6 +44,10 @@ fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
   
   print(summary(model))
   print(anova(model))
+  
+  
+  
+  
   
   # # Extract the model coefficients
   # model_coeffs <- summary(model)$coefficients

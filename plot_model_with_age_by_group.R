@@ -1,16 +1,12 @@
 
-plot_model_with_age_by_group <- function(result, score_column, standardize) {
+plot_model_with_age_by_group <- function(result, score_column) {
   final_data <- result$final_data
   model <- result$model
   
   # final_data <- final_data %>%
   #   mutate(Time = fct_relevel(Time, "12_months", "24_months", "school_age"))
   
-  if (standardize == 1) {
-    title <- paste("Standardized Raw Scores by Group and Age\n", score_column, "Used for School Age Score", sep = "")
-  } else {
-    title <- paste("Raw Scores by Group and Age\n", score_column, "Used for School Age Score", sep = "")
-  }
+  title <- paste("Standardized Raw Scores by Group and Age\n", score_column, "Used for School Age Score", sep = "")
   
   # Plot actual data and lines connected data from the same subject
   plot <- ggplot(final_data, aes(x = Time, y = Score)) + 
@@ -104,10 +100,6 @@ plot_model_with_age_by_group <- function(result, score_column, standardize) {
   print(plot)
   
   # Save plot to file
-  if (standardize == 1) {
-    ggsave(paste("Model of Standardized Scores by Group and Age", score_column, " Used for School Age Score.png"), plot = plot, dpi = 300, bg="white")
-  } else {
-    ggsave(paste("Model of Scores by Group and Age", score_column, " Used for School Age Score.png"), plot = plot, dpi = 300, bg="white")
-  }
+  ggsave(paste("Model of Standardized Scores by Group and Age", score_column, " Used for School Age Score.png"), plot = plot, dpi = 300, bg="white")
   
   }

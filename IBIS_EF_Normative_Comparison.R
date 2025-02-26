@@ -98,6 +98,7 @@ z_normative_df$Group[z_normative_df$Group == ""] <- NA
 # Dummy encode Sex
 z_normative_df <-  z_normative_df %>% 
   mutate(Sex = factor(Sex, levels = c("Male", "Female")))
+print("Dummy coding sex")
 contrasts(z_normative_df$Sex) <- contr.treatment(2, base = 2)
 
 # Print Sex contrast
@@ -108,10 +109,12 @@ z_normative_df <- z_normative_df %>%
   mutate(Group = factor(Group, levels = c("HR+", "HR-", "LR-")))
 
 if (dummy_encode == 1) {
-  # Apply dummy encoding to the group variable
+  # Apply dummy coding to the group variable
+  print("Dummy coding Group")
   contrasts(z_normative_df$Group) <- contr.treatment(3, base = 3)
 } else {
-# Apply effect encoding to the group variable
+  print("Effect coding Group")
+# Apply effect coding to the group variable
   contrasts(z_normative_df$Group) <- contr.sum(length(levels(z_normative_df$Group)))
 }
 

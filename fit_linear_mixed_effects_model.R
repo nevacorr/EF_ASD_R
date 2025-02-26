@@ -23,9 +23,11 @@ fit_linear_mixed_effects_model <- function(score_column, data, dummy_encode) {
    filter(!is.na(Score))  # Remove rows with missing scores
   
   if (dummy_encode == 1) {
+    print("Dummy coding Time")
     # Apply dummy coding to Time
     contrasts(final_data$Time) <- contr.treatment(3, base=3)
   } else {
+    print("Effect coding Time")
     # Apply effect coding to Time
     contrasts(final_data$Time) <- contr.sum(length(levels(final_data$Time)))
   }

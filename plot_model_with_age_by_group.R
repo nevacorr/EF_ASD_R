@@ -30,11 +30,7 @@ plot_model_with_age_by_group <- function(result, score_column) {
   # print(plot)
   
   # Save plot to file
-  if (standardize == 1) {
-    ggsave(paste("Standardized Raw Scores by Group and Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
-  } else {
-    ggsave(paste("Raw Scores by Group and Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
-  }
+  ggsave(paste("Standardized Raw Scores by Group and Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
   
   # Get predicted values from the model for each age
   final_data$predicted_score <- predict(model, newdata = final_data)

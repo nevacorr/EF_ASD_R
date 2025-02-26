@@ -83,11 +83,6 @@ plot_model_with_age_by_group(result_flanker1, "Flanker_Standard_Age_Corrected", 
 plot_model_with_age_by_group(result_dccs1, "DCCS_Standard_Age_Corrected", standardize)
 plot_model_with_age_by_group(result_brief2, "BRIEF2_GEC_T_score", standardize)
 
-#source("fit_linear_mixed_effects_model_predictschoolage.R")
-
-#result_flanker <- fit_linear_mixed_effects_model_predictschoolage("Flanker_Standard_Age_Corrected", ibis_behav_filtered, standardize)
-#result_dccs <- fit_linear_mixed_effects_model_predictschoolage("DCCS_Standard_Age_Corrected", ibis_behav_filtered, standardize)
-
 
 
 

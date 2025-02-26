@@ -9,6 +9,8 @@ library(lme4)
 library(emmeans)
 library(forcats)
 
+dummy_encode = 1
+
 rm(list = ls())
 
 # Load data
@@ -105,11 +107,13 @@ print(contrasts(z_normative_df$Sex))
 z_normative_df <- z_normative_df %>%
   mutate(Group = factor(Group, levels = c("HR+", "HR-", "LR-")))
 
-# Apply dummy encoding to the group variable
-# contrasts(z_normative_df$Group) <- contr.treatment(3, base = 3)
-
+if (dummy_encode == 1) {
+  # Apply dummy encoding to the group variable
+  contrasts(z_normative_df$Group) <- contr.treatment(3, base = 3)
+} else {
 # Apply effect encoding to the group variable
-contrasts(z_normative_df$Group) <- contr.sum(length(levels(z_normative_df$Group)))
+  contrasts(z_normative_df$Group) <- contr.sum(length(levels(z_normative_df$Group)))
+}
 
 # print coding
 print(contrasts(z_normative_df$Group))
@@ -123,9 +127,9 @@ z_normative_df$Identifiers <- factor(z_normative_df$Identifiers)
 source("fit_linear_mixed_effects_model.R")
 
 print("Normative Z-score analysis")
-result_flanker = fit_linear_mixed_effects_model('Flanker_Standard_Age_Corrected', z_normative_df)
-result_dccs = fit_linear_mixed_effects_model('DCCS_Standard_Age_Corrected', z_normative_df)
-result_brief2 = fit_linear_mixed_effects_model('BRIEF2_GEC_T_score', z_normative_df)
+result_flanker = fit_linear_mixed_effects_model('Flanker_Standard_Age_Corrected', z_normative_df, dummy_encode)
+result_dccs = fit_linear_mixed_effects_model('DCCS_Standard_Age_Corrected', z_normative_df, dummy_encode)
+result_brief2 = fit_linear_mixed_effects_model('BRIEF2_GEC_T_score', z_normative_df, dummy_encode)
 
 source("plot_model_with_age_by_group.R")
 

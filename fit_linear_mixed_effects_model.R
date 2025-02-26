@@ -1,5 +1,5 @@
 
-fit_linear_mixed_effects_model <- function(score_column, data) {
+fit_linear_mixed_effects_model <- function(score_column, data, dummy_encode) {
   
   # Reshape the data from wide to long format
   long_data <- data %>%
@@ -22,11 +22,13 @@ fit_linear_mixed_effects_model <- function(score_column, data) {
   final_data <- long_data %>%
    filter(!is.na(Score))  # Remove rows with missing scores
   
-  # Apply dummy coding to Time
-  # contrasts(final_data$Time) <- contr.treatment(3, base=3)
-  
-  # Apply effect coding to Time
-  contrasts(final_data$Time) <- contr.sum(length(levels(final_data$Time)))
+  if (dummy_encode == 1) {
+    # Apply dummy coding to Time
+    contrasts(final_data$Time) <- contr.treatment(3, base=3)
+  } else {
+    # Apply effect coding to Time
+    contrasts(final_data$Time) <- contr.sum(length(levels(final_data$Time)))
+  }
   
   # print coding
   print(contrasts(final_data$Time))

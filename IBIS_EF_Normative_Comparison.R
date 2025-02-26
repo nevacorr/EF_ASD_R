@@ -95,13 +95,34 @@ z_normative_df$BRIEF2_GEC_T_score <- -z_normative_df$BRIEF2_GEC_T_score
 # Convert empty strings in Group column to NA 
 z_normative_df$Group[z_normative_df$Group == ""] <- NA
 
+# Dummy encode Sex
+z_normative_df <-  z_normative_df %>% 
+  mutate(Sex = factor(Sex, levels = c("Male", "Female")))
+contrasts(z_normative_df$Sex) <- contr.treatment(2, base = 2)
+
+# Print Sex contrast
+print(contrasts(z_normative_df$Sex))
+
+# Convert group to a factor
+z_normative_df <- z_normative_df %>%
+  mutate(Group = factor(Group, levels = c("HR+", "HR-", "LR-")))
+
+# Apply dummy encoding to the group variable
+# contrasts(z_normative_df$Group) <- contr.treatment(3, base = 3)
+
+# Apply effect encoding to the group variable
+contrasts(z_normative_df$Group) <- contr.sum(length(levels(z_normative_df$Group)))
+
+# print coding
+print(contrasts(z_normative_df$Group))
+
 # Convert Identifiers,  Group,  Sex to factors
-z_normative_df$Sex <- factor(z_normative_df$Sex)
-z_normative_df$Group <- factor(z_normative_df$Group)
+# z_normative_df$Sex <- factor(z_normative_df$Sex)
+# z_normative_df$Group <- factor(z_normative_df$Group)
 z_normative_df$Identifiers <- factor(z_normative_df$Identifiers)
 
 # Set 'GroupLR-' as the reference level
-z_normative_df$Group <- relevel(z_normative_df$Group, ref = "LR-")
+# z_normative_df$Group <- relevel(z_normative_df$Group, ref = "LR-")
 
 source("fit_linear_mixed_effects_model.R")
 

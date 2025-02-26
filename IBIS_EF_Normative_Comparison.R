@@ -9,9 +9,9 @@ library(lme4)
 library(emmeans)
 library(forcats)
 
-dummy_encode = 1
-
 rm(list = ls())
+
+dummy_encode <- 1
 
 # Load data
 ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2.csv"))

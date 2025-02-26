@@ -31,7 +31,7 @@ plot_model_with_age_by_group <- function(result, score_column, standardize) {
         legend.title = element_text(size = 12)   # Set legend label font size
      )
       
-  print(plot)
+  # print(plot)
   
   # Save plot to file
   if (standardize == 1) {
@@ -62,7 +62,7 @@ plot_model_with_age_by_group <- function(result, score_column, standardize) {
       legend.title = element_text(size = 12)   # Set legend label font size
           )
   
-  print(plot)
+  # print(plot)
 
   # Average the data across all subjects in each group
   group_summary <- final_data %>%

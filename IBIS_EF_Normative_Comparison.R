@@ -129,8 +129,8 @@ result_brief2 = fit_linear_mixed_effects_model('BRIEF2_GEC_T_score', z_normative
 
 source("plot_model_with_age_by_group.R")
 
-plot_model_with_age_by_group(result_flanker, "LR- Normed Flanker_Standard_Age_Corrected", standardize)
-plot_model_with_age_by_group(result_dccs, "LR- Normed DCCS_Standard_Age_Corrected", standardize)
-plot_model_with_age_by_group(result_brief2, "LR- Normed Brief2 GEC score", standardize)
+plot_model_with_age_by_group(result_flanker, "LR- Normed Flanker_Standard_Age_Corrected")
+plot_model_with_age_by_group(result_dccs, "LR- Normed DCCS_Standard_Age_Corrected")
+plot_model_with_age_by_group(result_brief2, "LR- Normed Brief2 GEC score")
 
 mystop=1

@@ -12,7 +12,7 @@ fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
   # Make time an ordered factor so it is interpreted chronologically
   long_data <- long_data %>%
     mutate(Time = recode(Time, !!score_column := "school_age")) %>%
-    mutate(Time = factor(Time, levels = c("AB_12_Percent", "AB_24_Percent", "school_age")))
+    mutate(Time = factor(Time, levels = c("school_age", "AB_24_Percent", "AB_12_Percent")))
   
   long_data_cleaned <- long_data %>%
    filter(!is.na(Score))  # Remove rows with missing scores
@@ -20,8 +20,14 @@ fit_linear_mixed_effects_model <- function(score_column, data, standardize) {
   # Keep only columns that will be used in modeling
   final_data <- long_data_cleaned[, c("Identifiers", "Group", "Sex", "Time", "Score")]
   
+  # Apply dummy coding to Time
+  contrasts(final_data$Time) <- contr.treatment(3, base=3)
+  
   # Apply effect coding to Time
-  contrasts(final_data$Time) <-  contr.sum(3) # 3 levels: 12mo, 24mo, school_age
+  # contrasts(final_data$Time) <- contr.sum(length(levels(final_data$Time)))
+  
+  # print coding
+  print(contrasts(final_data$Time))
   
   counts <- final_data %>%
     group_by(Time, Group) %>%

@@ -44,18 +44,26 @@ ibis_behav_filtered <- ibis_behav_filtered %>% filter(Group != "LR+")
 
 # Dummy encode Sex
 ibis_behav_filtered <-  ibis_behav_filtered %>% 
-  mutate(Sex = ifelse(Sex == "Male", 1, 0))
+  mutate(Sex = factor(Sex, levels = c("Male", "Female")))
+contrasts(ibis_behav_filtered$Sex) <- contr.treatment(2, base = 2)
 
-# Convert Sex and Identifier to factors
-ibis_behav_filtered$Sex <- factor(ibis_behav_filtered$Sex)
+print(contrasts(ibis_behav_filtered$Sex))
+
+# Convert Identifier to factor
 ibis_behav_filtered$Identifiers <- factor(ibis_behav_filtered$Identifiers)
 
 # Convert group to a factor
 ibis_behav_filtered <- ibis_behav_filtered %>%
-  mutate(Group = factor(Group, levels = c("LR-", "HR-", "HR+")))
+  mutate(Group = factor(Group, levels = c("HR+", "HR-", "LR-")))
 
 # Apply dummy encoding to the group variable
-contrasts(ibis_behav_filtered$Group) <- contr.treatment(3, base = 1)
+contrasts(ibis_behav_filtered$Group) <- contr.treatment(3, base = 3)
+
+# Apply effect encoding to the group variable
+# contrasts(ibis_behav_filtered$Group) <- contr.sum(length(levels(ibis_behav_filtered$Group)))
+
+# print coding
+print(contrasts(ibis_behav_filtered$Group))
 
 # Count occurrences in the Group column
 counts <- ibis_behav_filtered %>%

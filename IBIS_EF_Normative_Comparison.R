@@ -11,7 +11,7 @@ library(forcats)
 
 rm(list = ls())
 
-dummy_encode <- 1
+dummy_encode <- 0
 
 # Load data
 ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2.csv"))
@@ -95,7 +95,7 @@ z_normative_df$BRIEF2_GEC_T_score <- -z_normative_df$BRIEF2_GEC_T_score
 # Convert empty strings in Group column to NA 
 z_normative_df$Group[z_normative_df$Group == ""] <- NA
 
-# Dummy encode Sex
+# Dummy code Sex
 z_normative_df <-  z_normative_df %>% 
   mutate(Sex = factor(Sex, levels = c("Male", "Female")))
 print("Dummy coding sex")
@@ -130,8 +130,11 @@ z_normative_df$Identifiers <- factor(z_normative_df$Identifiers)
 source("fit_linear_mixed_effects_model.R")
 
 print("Normative Z-score analysis")
+print("Results for Flanker")
 result_flanker = fit_linear_mixed_effects_model('Flanker_Standard_Age_Corrected', z_normative_df, dummy_encode)
+print("Results for DCCS")
 result_dccs = fit_linear_mixed_effects_model('DCCS_Standard_Age_Corrected', z_normative_df, dummy_encode)
+print("Results for Brief2")
 result_brief2 = fit_linear_mixed_effects_model('BRIEF2_GEC_T_score', z_normative_df, dummy_encode)
 
 source("plot_model_with_age_by_group.R")

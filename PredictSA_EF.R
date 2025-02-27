@@ -1,7 +1,13 @@
+# install.packages("ParBayesianOptimization")
+# install.packages("xgboost")
+
 library(dplyr)
 library(xgboost)
 library(Matrix)
-
+library(ParBayesianOptimization)
+library(xgboost)
+library(Metrics)  
+library(ggplot2)
 
 rm(list = ls())
 
@@ -83,4 +89,96 @@ final_model <- xgboost(
   nrounds = cv_results$best_iteration,
   verbose = TRUE
 )
+
+# Check best RSME
+print(cv_results$evaluation_log)
+
+# Get final RSME from cross validation
+best_rmse <- min(cv_results$evaluation_log$test_rmse_mean)
+print(paste("Best CV RMSE:", best_rmse))
+
+# Define Bayesian Optimization Function
+bayes_optimize_xgb <- function(eta, max_depth, min_child_weight, subsample, colsample_bytree) {
+  params <- list(
+    booster = "gbtree",
+    objective = "reg:squarederror",
+    eta = eta,  
+    max_depth = round(max_depth),  
+    min_child_weight = min_child_weight,
+    subsample = subsample,
+    colsample_bytree = colsample_bytree,
+    eval_metric = "rmse"
+  )
+  
+  # Perform 10-fold cross-validation
+  cv <- xgb.cv(
+    params = params,
+    data = dtrain,
+    nrounds = 100,
+    nfold = 10,
+    early_stopping_rounds = 10,
+    verbose = 0
+  )
+  
+  # Return the negative RMSE (because Bayesian Optimization maximizes)
+  list(Score = -min(cv$evaluation_log$test_rmse_mean), Pred = 0)
+}
+
+# Run Bayesian Optimization
+set.seed(123)  # Ensure reproducibility
+
+opt_res <- bayesOpt(
+  FUN = bayes_optimize_xgb,
+  bounds = list(
+    eta = c(0.01, 0.3),
+    max_depth = c(3, 10),
+    min_child_weight = c(1, 10),
+    subsample = c(0.5, 1),
+    colsample_bytree = c(0.5, 1)
+  ),
+  initPoints = 10,  # Initial random samples
+  iters.n = 20,  # Optimization iterations
+  acq = "ucb",  # Acquisition function
+  kappa = 2.576,  # Exploration-exploitation balance
+  verbose = 1
+)
+
+# Train final model with best parameters. (eta 0.118 max_depth 10 min_child_weight 10 subsample 0.5 colsample_bytree 1)
+best_params <- getBestPars(opt_res)
+
+final_model <- xgb.train(
+  params = c(best_params, list(objective = "reg:squarederror", eval_metric = "rmse")),
+  data = dtrain,
+  nrounds = 100
+)
+
+# Make predictions
+predictions <- predict(final_model, dtrain)
+
+
+# Get predictions
+y_pred <- predict(final_model, dtrain)
+
+# Compute RMSE
+rmse_value <- rmse(y, y_pred)
+print(paste("Final Model RMSE:", rmse_value))
+
+# Compute R² (coefficient of determination)
+r2_value <- cor(y, y_pred)^2
+print(paste("Final Model R²:", r2_value))
+
+# Plot actual vs. predicted values 
+
+df_results <- data.frame(Actual = y, Predicted = y_pred)
+
+ggplot(df_results, aes(x = Actual, y = Predicted)) +
+  geom_point(color = "blue", alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, color = "red") +
+  theme_minimal() +
+  labs(title = "Actual vs. Predicted", x = "Actual Values", y = "Predicted Values")
+
+# Calculate feature importance
+importance_matrix <- xgb.importance(model = final_model)
+xgb.plot.importance(importance_matrix)
+
 

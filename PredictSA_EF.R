@@ -41,7 +41,12 @@ final_df <- final_df %>% drop_na(all_of(response))
 
 # List of columns to exclude from predictors
 exclude_cols <- c("CandID", "Identifiers", "Combined_ASD_DX", "Risk", "Group", "AB_12_Percent", "AB_24_Percent", "BRIEF2_GEC_T_score", 
-                  "BRIEF2_GEC_raw_score", "DCCS_Standard_Age_Corrected", "ICV_V12", "ICV_V24", "totTiss_V12", "totTiss_V24")  
+                   "BRIEF2_GEC_raw_score", "DCCS_Standard_Age_Corrected", "ICV_V12", "ICV_V24", "totTiss_V12", "totTiss_V24")  
+
+# Removed Group from excluded values
+# exclude_cols <- c("CandID", "Identifiers", "Combined_ASD_DX", "Risk", "AB_12_Percent", "AB_24_Percent", "BRIEF2_GEC_T_score", 
+                  # "BRIEF2_GEC_raw_score", "DCCS_Standard_Age_Corrected", "ICV_V12", "ICV_V24", "totTiss_V12", "totTiss_V24")  
+
 
 # Select predictor columns (all except response and exclude_cols)
 predictors <- final_df %>%
@@ -57,7 +62,29 @@ predictors <- predictors %>%
 X <- as.matrix(predictors)
 
 # Convert to XGBoost DMatrix
-dtrain <- xgb.DMatrix(data = X, label = y, missing = NA)
+# dtrain <- xgb.DMatrix(data = X, label = y, missing = NA)
+
+# Split into train (80%) and test (20%) sets
+set.seed(123)
+train_idx <- sample(seq_len(nrow(final_df)), size = 0.8 * nrow(final_df))
+train_data <- final_df[train_idx, ]
+test_data <- final_df[-train_idx, ]
+
+# Prepare train and test sets
+X_train <- train_data %>% select(-all_of(c(response, exclude_cols))) %>%
+  mutate(across(where(is.character), as.factor)) %>% 
+  mutate(across(where(is.factor), as.numeric)) %>% 
+  as.matrix()
+y_train <- train_data[[response]]
+
+X_test <- test_data %>% select(-all_of(c(response, exclude_cols))) %>%
+  mutate(across(where(is.character), as.factor)) %>% 
+  mutate(across(where(is.factor), as.numeric)) %>% 
+  as.matrix()
+y_test <- test_data[[response]]
+
+dtrain <- xgb.DMatrix(data = X_train, label = y_train, missing = NA)
+dtest <- xgb.DMatrix(data = X_test, label = y_test, missing = NA)
 
 # Define basic parameters for regression
 params <- list(
@@ -156,26 +183,38 @@ final_model <- xgb.train(
 predictions <- predict(final_model, dtrain)
 
 
-# Get predictions
-y_pred <- predict(final_model, dtrain)
+# # Get predictions
+# y_pred <- predict(final_model, dtrain)
+# 
+# # Compute RMSE
+# rmse_value <- rmse(y, y_pred)
+# print(paste("Final Model RMSE:", rmse_value))
+# 
+# # Compute R² (coefficient of determination)
+# r2_value <- cor(y, y_pred)^2
+# print(paste("Final Model R²:", r2_value))
 
-# Compute RMSE
-rmse_value <- rmse(y, y_pred)
-print(paste("Final Model RMSE:", rmse_value))
+# Make predictions on the test set
+y_test_pred <- predict(final_model, dtest)
 
-# Compute R² (coefficient of determination)
-r2_value <- cor(y, y_pred)^2
-print(paste("Final Model R²:", r2_value))
+# Compute RMSE on test set
+rmse_test <- rmse(y_test, y_test_pred)
+print(paste("Test RMSE:", rmse_test))
+
+# Compute R² on test set
+r2_test <- cor(y_test, y_test_pred)^2
+print(paste("Test R²:", r2_test))
 
 # Plot actual vs. predicted values 
 
-df_results <- data.frame(Actual = y, Predicted = y_pred)
+df_results <- data.frame(Actual = y_test, Predicted = y_test_pred)
 
 ggplot(df_results, aes(x = Actual, y = Predicted)) +
   geom_point(color = "blue", alpha = 0.6) +
   geom_abline(slope = 1, intercept = 0, color = "red") +
   theme_minimal() +
-  labs(title = "Actual vs. Predicted", x = "Actual Values", y = "Predicted Values")
+  labs(title = paste("Actual vs. Predicted Test Set", response, "based on volumetric data and sex"),
+       x = "Actual Values", y = "Predicted Values")
 
 # Calculate feature importance
 importance_matrix <- xgb.importance(model = final_model)

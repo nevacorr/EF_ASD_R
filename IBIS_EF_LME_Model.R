@@ -97,6 +97,6 @@ source("plot_model_with_age_by_group.R")
 
 plot_model_with_age_by_group(result_flanker, "Zscore Flanker_Standard_Age_Corrected")
 plot_model_with_age_by_group(result_dccs, "Zscore DCCS_Standard_Age_Corrected")
-plot_model_with_age_by_group(result_brief2, "Zscore Brief2 GEC score")
+plot_model_with_age_by_group(result_brief2, "Zscore Brief2 GEC T score")
 
 mystop=1

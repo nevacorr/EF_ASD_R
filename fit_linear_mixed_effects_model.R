@@ -1,5 +1,5 @@
 
-fit_linear_mixed_effects_model <- function(score_column, data, dummy_encode) {
+fit_linear_mixed_effects_model <- function(score_column, data) {
   
   # Reshape the data from wide to long format
   long_data <- data %>%
@@ -7,7 +7,12 @@ fit_linear_mixed_effects_model <- function(score_column, data, dummy_encode) {
       cols = c("AB_12_Percent", "AB_24_Percent", score_column),
       names_to = "Time",
       values_to = "Score"
-    ) 
+    ) %>%
+    mutate(Time = case_when(
+      Time == "AB_12_Percent" ~ "12_months",
+      Time == "AB_24_Percent" ~ "24_months",
+      Time == score_column ~ "school_age"
+    ))
   
   # Remove columns for school age EF variables not to be modeled 
   columns_to_keep <- c("Identifiers", "Group", "Sex", "Time", "Score")  # Specify columns to keep
@@ -15,25 +20,14 @@ fit_linear_mixed_effects_model <- function(score_column, data, dummy_encode) {
   
   # Change name of score_column to school_age
   # Make time an ordered factor so it is interpreted chronologically
-  long_data <- long_data %>%
-    mutate(Time = recode(Time, !!score_column := "school_age")) %>%
-    mutate(Time = factor(Time, levels = c("school_age", "AB_24_Percent", "AB_12_Percent")))
+  # long_data <- long_data %>%
+  #   mutate(Time = recode(Time, !!score_column := "school_age")) %>%
+  #   mutate(Time = factor(Time, levels = c("school_age", "AB_24_Percent", "AB_12_Percent")))
+  
+  # long_data$Time = factor(long_data$Time)
   
   final_data <- long_data %>%
    filter(!is.na(Score))  # Remove rows with missing scores
-  
-  if (dummy_encode == 1) {
-    print("Dummy coding Time")
-    # Apply dummy coding to Time
-    contrasts(final_data$Time) <- contr.treatment(3, base=3)
-  } else {
-    print("Effect coding Time")
-    # Apply effect coding to Time
-    contrasts(final_data$Time) <- contr.sum(length(levels(final_data$Time)))
-  }
-  
-  # print coding
-  print(contrasts(final_data$Time))
   
   counts <- final_data %>%
     group_by(Time, Group) %>%

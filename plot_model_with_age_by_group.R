@@ -1,4 +1,6 @@
 
+library(ggplot2)
+
 plot_model_with_age_by_group <- function(result, score_column) {
   final_data <- result$final_data
   model <- result$model
@@ -26,8 +28,6 @@ plot_model_with_age_by_group <- function(result, score_column) {
         axis.title.y = element_text(size = 12),   # Set y-axis label font size
         legend.title = element_text(size = 12)   # Set legend label font size
      )
-      
-  # print(plot)
   
   # Save plot to file
   ggsave(paste("Standardized Raw Scores by Group and Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
@@ -35,7 +35,7 @@ plot_model_with_age_by_group <- function(result, score_column) {
   # Get predicted values from the model for each age
   final_data$predicted_score <- predict(model, newdata = final_data)
   
-  # Plot actual and predicted data for each subject individually
+  # Plot modeled data for each subject individually
   plot <- ggplot(final_data, aes(x = Time, y = Score, color = Group, group = interaction(Group, Identifiers))) +
     geom_point(alpha = 0.6, size = 1) +  # Observed scores
     geom_line(aes(y = predicted_score), size = 0.2) + # Predicted scores
@@ -54,7 +54,8 @@ plot_model_with_age_by_group <- function(result, score_column) {
       legend.title = element_text(size = 12)   # Set legend label font size
           )
   
-  # print(plot)
+  # Save plot to file
+  ggsave(paste("Modele of Individual Scores by Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
 
   # Average the data across all subjects in each group
   group_summary <- final_data %>%
@@ -62,15 +63,7 @@ plot_model_with_age_by_group <- function(result, score_column) {
     summarize(mean_predicted_score = mean(predicted_score),
               mean_observed_score = mean(Score),
               .groups = "drop") 
-  # %>%
-  #   mutate(Time = factor(Time, levels = c("12_months", "24_months", "school_age")))  # Ensure correct order
-  # 
-  
-  # group_summary <- group_summary %>%
-  #   mutate(Time = fct_relevel(Time, "12_months", "24_months", "school_age"))
-  
-  # Plot group-level trends
-  library(ggplot2)
+
   
   plot <- ggplot(group_summary, aes(x = Time, y = mean_predicted_score, color = Group, group = Group)) +
     geom_point(data = final_data,                        # Plot individual data points

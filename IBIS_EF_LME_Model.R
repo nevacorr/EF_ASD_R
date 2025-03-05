@@ -1,7 +1,7 @@
 
-install.packages(emmeans)
-install.packages(forcats)
-install.packages(ggplot2)
+# install.packages(emmeans)
+# install.packages(forcats)
+# install.packages(ggplot2)
 
 library(dplyr)
 library(tidyr)
@@ -51,7 +51,7 @@ ab12_df_norm <- clean_and_calculate_zscores(ab12_df, 'AB_12_Percent')
 ab24_df_norm <- clean_and_calculate_zscores(ab24_df, 'AB_24_Percent')
 brief2_df_norm <- clean_and_calculate_zscores(brief2_df, 'BRIEF2_GEC_T_score')
 
-# Select the Identifiers and *_z_score_norm columns from each dataframe
+# Select the Identifiers and school age score column from each dataframe
 flanker_selected <- flanker_df_norm %>% select(Identifiers, ends_with('Flanker_Standard_Age_Corrected'))
 dccs_selected <- dccs_df_norm %>% select(Identifiers, ends_with('DCCS_Standard_Age_Corrected'))
 ab12_selected <- ab12_df_norm %>% select(Identifiers, ends_with('AB_12_Percent'))
@@ -95,8 +95,8 @@ result_brief2 = fit_linear_mixed_effects_model('BRIEF2_GEC_T_score', z_normative
 
 source("plot_model_with_age_by_group.R")
 
-plot_model_with_age_by_group(result_flanker, "LR- Normed Flanker_Standard_Age_Corrected")
-plot_model_with_age_by_group(result_dccs, "LR- Normed DCCS_Standard_Age_Corrected")
-plot_model_with_age_by_group(result_brief2, "LR- Normed Brief2 GEC score")
+plot_model_with_age_by_group(result_flanker, "Zscore Flanker_Standard_Age_Corrected")
+plot_model_with_age_by_group(result_dccs, "Zscore DCCS_Standard_Age_Corrected")
+plot_model_with_age_by_group(result_brief2, "Zscore Brief2 GEC score")
 
 mystop=1

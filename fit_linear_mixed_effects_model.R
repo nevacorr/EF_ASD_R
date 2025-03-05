@@ -34,8 +34,10 @@ fit_linear_mixed_effects_model <- function(score_column, data) {
   # and includes subject as random factor
   model <- lmer(Score ~ Sex + Group + Time + Group * Time + (1 | Identifiers), data = final_data)
   
+  print(paste("Model using", score_column, "as School Age EF measure"))
+  print(paste("All Scores Converted to Z-scores"))
   print(summary(model))
-  # print(anova(model))
+  print(anova(model))
   
   emm <- emmeans(model, pairwise ~ Group | Time, adjust = "tukey")
   

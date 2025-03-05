@@ -32,7 +32,7 @@ clean_and_calculate_zscores <- function(df, column) {
   df_clean <- df_clean %>% filter(Group != "LR+")
 
   # Replace score with z score  
-  df[[column]]<- (df[[column]] - mean(df[[column]], na.rm = TRUE)) / sd(df[[column]], na.rm = TRUE)
+  df_clean[[column]]<- (df_clean[[column]] - mean(df_clean[[column]], na.rm = TRUE)) / sd(df_clean[[column]], na.rm = TRUE)
     
   return(df_clean)
 }
@@ -69,15 +69,6 @@ z_normative_df <- ibis_demo %>%
   left_join(ab24_selected, by = "Identifiers") %>%
   left_join(brief2_selected, by = "Identifiers")
 
-# z_normative_df <- z_normative_df %>% 
-#   rename(
-#     Flanker_Standard_Age_Corrected = Flanker_Standard_Age_Corrected_z_score_norm,
-#     DCCS_Standard_Age_Corrected = DCCS_Standard_Age_Corrected_z_score_norm,
-#     AB_12_Percent = AB_12_Percent_z_score_norm,
-#     AB_24_Percent = AB_24_Percent_z_score_norm,
-#     BRIEF2_GEC_T_score = BRIEF2_GEC_T_score_z_score_norm
-#   )
-
 # For the Brief2 GEC score, higher values indicate more difficulty with EF
 # Flip the sign of the Brief2 column
 z_normative_df$BRIEF2_GEC_T_score <- -z_normative_df$BRIEF2_GEC_T_score
@@ -85,38 +76,12 @@ z_normative_df$BRIEF2_GEC_T_score <- -z_normative_df$BRIEF2_GEC_T_score
 # Convert empty strings in Group column to NA 
 z_normative_df$Group[z_normative_df$Group == ""] <- NA
 
-# Dummy code Sex
-# z_normative_df <-  z_normative_df %>% 
-  # mutate(Sex = factor(Sex, levels = c("Male", "Female")))
-# print("Dummy coding sex")
-# contrasts(z_normative_df$Sex) <- contr.treatment(2, base = 2)
-
-# Print Sex contrast
-# print(contrasts(z_normative_df$Sex))
-
-# Convert group to a factor
+# Convert Group and Identifiers to factor
 z_normative_df$Group <- factor(z_normative_df$Group)
-
-z_normative_df$Group <- relevel(z_normative_df$Group, ref = "LR-")
-
-# if (dummy_encode == 1) {
-  # Apply dummy coding to the group variable
-  # print("Dummy coding Group")
-  # contrasts(z_normative_df$Group) <- contr.treatment(3, base = 3)
-# } else {
-#   print("Effect coding Group")
-# # Apply effect coding to the group variable
-#   contrasts(z_normative_df$Group) <- contr.sum(length(levels(z_normative_df$Group)))
-# }
-
-# print coding
-# print(contrasts(z_normative_df$Group))
-
-# Convert Identifiers to factor
 z_normative_df$Identifiers <- factor(z_normative_df$Identifiers)
 
-# Set 'GroupLR-' as the reference level
-# z_normative_df$Group <- relevel(z_normative_df$Group, ref = "LR-")
+# Make LR- group the reference group
+z_normative_df$Group <- relevel(z_normative_df$Group, ref = "LR-")
 
 source("fit_linear_mixed_effects_model.R")
 

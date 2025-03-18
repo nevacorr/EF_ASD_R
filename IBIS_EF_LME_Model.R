@@ -20,6 +20,13 @@ unique_duplicates <- names(table(ibis_behav_orig$Identifiers)[table(ibis_behav_o
 
 ibis_behav <- ibis_behav_orig[!duplicated(ibis_behav_orig$Identifiers), ]
 
+# Rename groups
+ibis_behav <- ibis_behav %>%
+  mutate(Group = recode(Group, 
+                        "HR+" = "HL-ASD", 
+                        "HR-" = "HL-noASD", 
+                        "LR-" = "LL"))
+
 # Function to clean data and calculate z-scores
 clean_and_calculate_zscores <- function(df, column) {
 
@@ -31,6 +38,13 @@ clean_and_calculate_zscores <- function(df, column) {
   
   # Remove LR+ group
   df_clean <- df_clean %>% filter(Group != "LR+")
+  
+  # Rename groups
+  df_clean <- df_clean %>%
+    mutate(Group = recode(Group, 
+                                "HR+" = "HL-ASD", 
+                                "HR-" = "HL-noASD", 
+                                "LR-" = "LL"))
 
   # Replace score with z score  
   df_clean[[column]]<- (df_clean[[column]] - mean(df_clean[[column]], na.rm = TRUE)) / sd(df_clean[[column]], na.rm = TRUE)
@@ -78,11 +92,11 @@ z_normative_df$BRIEF2_GEC_T_score <- -z_normative_df$BRIEF2_GEC_T_score
 z_normative_df$Group[z_normative_df$Group == ""] <- NA
 
 # Convert Group and Identifiers to factor
-z_normative_df$Group <- factor(z_normative_df$Group)
+z_normative_df$Group <- factor(z_normative_df$Group, levels = c("LL", "HL-noASD", "HL-ASD"))
 z_normative_df$Identifiers <- factor(z_normative_df$Identifiers)
 
-# Make LR- group the reference group
-z_normative_df$Group <- relevel(z_normative_df$Group, ref = "LR-")
+# Make LL group the reference group
+z_normative_df$Group <- relevel(z_normative_df$Group, ref = "LL")
 
 source("fit_linear_mixed_effects_model.R")
 

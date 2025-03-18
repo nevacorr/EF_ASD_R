@@ -8,6 +8,7 @@ library(tidyr)
 library(lme4)
 library(emmeans)
 library(forcats)
+library(lmerTest)
 
 rm(list = ls())
 
@@ -95,8 +96,8 @@ result_brief2 = fit_linear_mixed_effects_model('BRIEF2_GEC_T_score', z_normative
 
 source("plot_model_with_age_by_group.R")
 
-plot_model_with_age_by_group(result_flanker, "Zscore Flanker_Standard_Age_Corrected")
-plot_model_with_age_by_group(result_dccs, "Zscore DCCS_Standard_Age_Corrected")
-plot_model_with_age_by_group(result_brief2, "Zscore Brief2 GEC T score")
+plot_model_with_age_by_group(result_flanker, "Flanker")
+plot_model_with_age_by_group(result_dccs, "Dimensional Change Card Sort")
+plot_model_with_age_by_group(result_brief2, "Brief2")
 
 mystop=1

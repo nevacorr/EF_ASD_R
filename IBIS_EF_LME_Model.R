@@ -20,6 +20,8 @@ unique_duplicates <- names(table(ibis_behav_orig$Identifiers)[table(ibis_behav_o
 
 ibis_behav <- ibis_behav_orig[!duplicated(ibis_behav_orig$Identifiers), ]
 
+write.csv(ibis_behav, 'ibis_subj_demographics_and_data_used_for_2025analysis.csv', row.names = FALSE)
+
 # Rename groups
 ibis_behav <- ibis_behav %>%
   mutate(Group = recode(Group, 

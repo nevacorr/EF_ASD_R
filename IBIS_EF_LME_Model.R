@@ -12,6 +12,14 @@ library(lmerTest)
 
 rm(list = ls())
 
+# Define output file path
+subdir <- "processed_datafiles"
+
+# Create subdirectory if it doesn't exist
+if (!dir.exists(subdir)) {
+  dir.create(subdir)
+}
+
 # Load data
 ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2.csv"))
 
@@ -20,7 +28,8 @@ unique_duplicates <- names(table(ibis_behav_orig$Identifiers)[table(ibis_behav_o
 
 ibis_behav <- ibis_behav_orig[!duplicated(ibis_behav_orig$Identifiers), ]
 
-write.csv(ibis_behav, 'ibis_subj_demographics_and_data_used_for_2025analysis.csv', row.names = FALSE)
+# Write data without duplicates to file
+write.csv(ibis_behav, file = file.path(subdir, 'ibis_subj_demographics_and_data_used_for_2025analysis.csv'), row.names = FALSE)
 
 # Rename groups
 ibis_behav <- ibis_behav %>%
@@ -50,7 +59,7 @@ clean_and_calculate_zscores <- function(df, column) {
 
   # Replace score with z score  
   df_clean[[column]]<- (df_clean[[column]] - mean(df_clean[[column]], na.rm = TRUE)) / sd(df_clean[[column]], na.rm = TRUE)
-    
+  
   return(df_clean)
 }
 
@@ -67,6 +76,13 @@ dccs_df_norm <- clean_and_calculate_zscores(dccs_df, 'DCCS_Standard_Age_Correcte
 ab12_df_norm <- clean_and_calculate_zscores(ab12_df, 'AB_12_Percent')
 ab24_df_norm <- clean_and_calculate_zscores(ab24_df, 'AB_24_Percent')
 brief2_df_norm <- clean_and_calculate_zscores(brief2_df, 'BRIEF2_GEC_T_score')
+
+# Write cleaned dataframes to file
+write.csv(flanker_df_norm, file=file.path(subdir, 'flanker_used_for_2025analysis.csv'), row.names = FALSE)
+write.csv(dccs_df_norm, file=file.path(subdir, 'dccs_used_for_2025analysis.csv'), row.names = FALSE)
+write.csv(ab12_df_norm, file=file.path(subdir, 'ab12_used_for_2025analysis.csv'), row.names = FALSE)
+write.csv(ab24_df_norm, file=file.path(subdir, 'ab24_used_for_2025analysis.csv'), row.names = FALSE)
+write.csv(brief2_df_norm, file=file.path(subdir, 'brief2_used_for_2025analysis.csv'), row.names = FALSE)
 
 # Select the Identifiers and school age score column from each dataframe
 flanker_selected <- flanker_df_norm %>% select(Identifiers, ends_with('Flanker_Standard_Age_Corrected'))

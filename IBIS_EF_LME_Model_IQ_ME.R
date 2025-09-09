@@ -21,13 +21,29 @@ if (!dir.exists(subdir)) {
 }
 
 # Load data
-ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/Behav_Data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2.csv"))
+ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/Behav_Data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2_addedmissing_age_data_mat_ed_8Sep2025a.csv"))
 
 unique_duplicates <- names(table(ibis_behav_orig$Identifiers)[table(ibis_behav_orig$Identifiers) > 1])
 # Duplicates are UNC0013, UNC0041, UNC0147, UNC0154
 
 # Remove rows with duplicate identifiers
 ibis_behav_rd <- ibis_behav_orig[!duplicated(ibis_behav_orig$Identifiers), ]
+
+# Show values for maternal education and value counts
+print(table(ibis_behav_rd$V06.tsi.mother_education))
+
+# Convert maternal education to binary variable (note remove college_degree 
+# if want a little more balanced)
+# Code missing values as 0
+ibis_behav_rd$maternal_education <- 
+  ifelse(ibis_behav_rd$V06.tsi.mother_education %in% c("college_degree", "some_grad_level", 
+                                                       "grad_degree"), 1, 0)
+
+print(table(ibis_behav_rd$maternal_education, useNA = "ifany"))
+
+# If BRIEF2 columns have prefix "VSD.All" and Parent substrings, remove these substrings
+names(ibis_behav_rd) <- gsub("^VSD\\.All\\.BRIEF2_", "BRIEF2_", names(ibis_behav_rd))
+names(ibis_behav_rd) <- gsub("^BRIEF2_Parent.", "BRIEF2_", names(ibis_behav_rd))
 
 # Load IQ data
 iq_df <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/Behav_Data/IQ data_Long_data-2025-07-26T23_51_14.152Z.csv"))
@@ -46,7 +62,7 @@ iq_df_subset[["V24.mullen.composite_standard_score"]]<-
 ibis_behav <- merge(ibis_behav_rd, iq_df_subset, by = 'Identifiers', all.x=TRUE)
 
 # Write dataframe to file
-write.csv(ibis_behav, file = file.path(subdir, 'ibis_subj_demographics_and_data_used_for_2025analysis_plusIQ.csv'), row.names = FALSE)
+write.csv(ibis_behav, file = file.path(subdir, 'ibis_subj_demographics_and_data_used_for_2025analysis_plusIQandME.csv'), row.names = FALSE)
 
 # Rename groups
 ibis_behav <- ibis_behav %>%
@@ -61,17 +77,27 @@ clean_and_calculate_zscores <- function(df, column) {
   # Convert empty Group string values to NA 
   df$Group[df$Group == ""] <- NA
   
-  # Remove all rows containing NA values except for IQ column
+  # Convert empty maternal education string values to NA 
+  df$V06.tsi.mother_education[df$V06.tsi.mother_education == ""] <- NA
+  
+  # Remove all rows containing NA values except for V24 mullens and mother education columns
   df <- df %>%
-    filter(if_all(-V24.mullen.composite_standard_score, ~ !is.na(.)))
+    filter(if_all(-c(V24.mullen.composite_standard_score, V06.tsi.mother_education), ~ !is.na(.)))
   
   # # Remove rows where V24 mullens is NA
   num_removed <- df %>% filter(is.na(V24.mullen.composite_standard_score)) %>% nrow()
   df_clean <- df %>% filter(!is.na(V24.mullen.composite_standard_score))
   cat(column, "removed", num_removed, "rows missing IQ\n")
   
-  # Remove other rows with NA values
-  # df_clean <- na.omit(df)
+  # # # Count and write ids for rows where mother education string is NA
+  # num_removed <- df %>% filter(is.na(V06.tsi.mother_education)) %>% nrow()
+  # df_clean <- df %>% filter(!is.na(V06.tsi.mother_education))
+  # cat(column, "removed", num_removed, "rows missing maternal education\n")
+  missing_ids <- df_clean$Identifiers[is.na(df_clean$V06.tsi.mother_education)]
+  cat(column, "missing me from following subjects:", paste(missing_ids, collapse = ", "), "\n")
+  
+  # Remove mother education string column
+  df_clean <- df_clean %>% select(-V06.tsi.mother_education)
   
   # Remove LR+ group
   df_clean <- df_clean %>% filter(Group != "LR+")
@@ -90,11 +116,11 @@ clean_and_calculate_zscores <- function(df, column) {
 }
 
 # Make subset dataframes for scores
-flanker_df <- ibis_behav %>% select(Identifiers, Group, Flanker_Standard_Age_Corrected, V24.mullen.composite_standard_score)
-dccs_df <- ibis_behav %>% select(Identifiers, Group, DCCS_Standard_Age_Corrected, V24.mullen.composite_standard_score)
-ab12_df <- ibis_behav %>% select(Identifiers, Group, AB_12_Percent, V24.mullen.composite_standard_score)
-ab24_df <- ibis_behav %>% select(Identifiers, Group, AB_24_Percent, V24.mullen.composite_standard_score)
-brief2_df <- ibis_behav %>% select(Identifiers, Group, BRIEF2_GEC_T_score, V24.mullen.composite_standard_score)
+flanker_df <- ibis_behav %>% select(Identifiers, Group, Flanker_Standard_Age_Corrected, V24.mullen.composite_standard_score, V06.tsi.mother_education, maternal_education)
+dccs_df <- ibis_behav %>% select(Identifiers, Group, DCCS_Standard_Age_Corrected, V24.mullen.composite_standard_score, V06.tsi.mother_education, maternal_education)
+ab12_df <- ibis_behav %>% select(Identifiers, Group, AB_12_Percent, V24.mullen.composite_standard_score, V06.tsi.mother_education, maternal_education)
+ab24_df <- ibis_behav %>% select(Identifiers, Group, AB_24_Percent, V24.mullen.composite_standard_score, V06.tsi.mother_education, maternal_education)
+brief2_df <- ibis_behav %>% select(Identifiers, Group, BRIEF2_GEC_T_score, V24.mullen.composite_standard_score, V06.tsi.mother_education, maternal_education)
 
 # Apply the cleaning and z-score calculation function to the dataframes
 flanker_df_norm <- clean_and_calculate_zscores(flanker_df, 'Flanker_Standard_Age_Corrected')
@@ -104,13 +130,13 @@ ab24_df_norm <- clean_and_calculate_zscores(ab24_df, 'AB_24_Percent')
 brief2_df_norm <- clean_and_calculate_zscores(brief2_df, 'BRIEF2_GEC_T_score')
 
 # Write cleaned dataframes to file
-write.csv(flanker_df_norm, file=file.path(subdir, 'flanker_used_for_2025analysis_withIQ.csv'), row.names = FALSE)
-write.csv(dccs_df_norm, file=file.path(subdir, 'dccs_used_for_2025analysis_withIQ.csv'), row.names = FALSE)
-write.csv(ab12_df_norm, file=file.path(subdir, 'ab12_used_for_2025analysis_withIQ.csv'), row.names = FALSE)
-write.csv(ab24_df_norm, file=file.path(subdir, 'ab24_used_for_2025analysis_withIQ.csv'), row.names = FALSE)
-write.csv(brief2_df_norm, file=file.path(subdir, 'brief2_used_for_2025analysis_withIQ.csv'), row.names = FALSE)
+write.csv(flanker_df_norm, file=file.path(subdir, 'flanker_used_for_2025analysis_withIQandME.csv'), row.names = FALSE)
+write.csv(dccs_df_norm, file=file.path(subdir, 'dccs_used_for_2025analysis_withIQandME.csv'), row.names = FALSE)
+write.csv(ab12_df_norm, file=file.path(subdir, 'ab12_used_for_2025analysis_withIQandME.csv'), row.names = FALSE)
+write.csv(ab24_df_norm, file=file.path(subdir, 'ab24_used_for_2025analysis_withIQandME.csv'), row.names = FALSE)
+write.csv(brief2_df_norm, file=file.path(subdir, 'brief2_used_for_2025analysis_withIQandME.csv'), row.names = FALSE)
 
-# Select the Identifiers and school age score column from each dataframe
+# Select the Identifiers column from each dataframe
 flanker_selected <- flanker_df_norm %>% select(Identifiers, ends_with('Flanker_Standard_Age_Corrected'))
 dccs_selected <- dccs_df_norm %>% select(Identifiers, ends_with('DCCS_Standard_Age_Corrected'))
 ab12_selected <- ab12_df_norm %>% select(Identifiers, ends_with('AB_12_Percent'))
@@ -118,7 +144,7 @@ ab24_selected <- ab24_df_norm %>% select(Identifiers, ends_with('AB_24_Percent')
 brief2_selected <- brief2_df_norm %>% select(Identifiers, ends_with('BRIEF2_GEC_T_score'))
 
 # Make a dataframe with just the demographic variables 
-ibis_demo = ibis_behav %>% select(Identifiers, Group, Sex, V24.mullen.composite_standard_score)
+ibis_demo = ibis_behav %>% select(Identifiers, Group, Sex, V24.mullen.composite_standard_score, maternal_education)
 
 # Merge behavior with the demographics dataframe based on the Identifiers column
 z_normative_df <- ibis_demo %>%
@@ -145,15 +171,18 @@ z_normative_df$Group <- relevel(z_normative_df$Group, ref = "LL")
 # Rename V24 mullens column to IQ
 z_normative_df <- z_normative_df %>% rename(IQ = V24.mullen.composite_standard_score)
 
-source("fit_linear_mixed_effects_model_IQ.R")
+# Rename maternal_education to ME
+z_normative_df <- z_normative_df %>% rename(ME = maternal_education)
+
+source("fit_linear_mixed_effects_model_IQ_ME.R")
 
 print("Normative Z-score analysis")
 print("Results for Flanker")
-result_flanker = fit_linear_mixed_effects_model_IQ('Flanker_Standard_Age_Corrected', z_normative_df)
+result_flanker = fit_linear_mixed_effects_model_IQ_ME('Flanker_Standard_Age_Corrected', z_normative_df)
 print("Results for DCCS")
-result_dccs = fit_linear_mixed_effects_model_IQ('DCCS_Standard_Age_Corrected', z_normative_df)
+result_dccs = fit_linear_mixed_effects_model_IQ_ME('DCCS_Standard_Age_Corrected', z_normative_df)
 print("Results for Brief2")
-result_brief2 = fit_linear_mixed_effects_model_IQ('BRIEF2_GEC_T_score', z_normative_df)
+result_brief2 = fit_linear_mixed_effects_model_IQ_ME('BRIEF2_GEC_T_score', z_normative_df)
 
 source("plot_model_with_age_by_group.R")
 

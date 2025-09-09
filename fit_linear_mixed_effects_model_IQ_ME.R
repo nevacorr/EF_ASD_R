@@ -1,4 +1,4 @@
-fit_linear_mixed_effects_model_IQ <- function(score_column, data) {
+fit_linear_mixed_effects_model_IQ_ME <- function(score_column, data) {
   
   # Reshape the data from wide to long format
   long_data <- data %>%
@@ -14,7 +14,7 @@ fit_linear_mixed_effects_model_IQ <- function(score_column, data) {
     ))
   
   # Keep only columns used in modeling 
-  columns_to_keep <- c("Identifiers", "Group", "Sex", "IQ", "Time", "Score")  # Specify columns to keep
+  columns_to_keep <- c("Identifiers", "Group", "Sex", "IQ", "ME", "Time", "Score")  # Specify columns to keep
   long_data <- long_data %>% select(all_of(columns_to_keep))
   
   # long_data$Time = factor(long_data$Time)
@@ -30,8 +30,9 @@ fit_linear_mixed_effects_model_IQ <- function(score_column, data) {
   print(counts)
   
   # Create a model that relates scores at all ages to group and time point, takes sex 
-  # and IQ into account and includes subject as random factor
-  model <- lmer(Score ~ Sex + IQ + Group + Time + Group * Time + (1 | Identifiers), data = final_data)
+  # IQ and ME into account and includes subject as random factor
+  model <- lmer(Score ~ Sex + IQ + ME + Group + Time + Group * Time 
+                + (1 | Identifiers), data = final_data)
   
   print(paste("Model using", score_column, "as School Age EF measure"))
   print(paste("All Scores Converted to Z-scores"))

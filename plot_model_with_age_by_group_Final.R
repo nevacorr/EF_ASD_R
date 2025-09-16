@@ -74,7 +74,6 @@ plot_model_with_age_by_group_Final <- function(result, score_column, use_covaria
     geom_point(data = final_data,                        # Plot individual data points
                aes(x = Time, y = Score, color = Group), 
                alpha = 0.6, size = 2) + 
-    #geom_point(aes(y = mean_observed_score), size = 4) +  # Mean observed scores (group level)
     geom_line(size = 1) +                                 # Group-level predicted score lines
     labs(title = paste("<b>Executive Function vs. Age by Group</b><br>", 
                        score_column, " used for school age score", sep = ""),

@@ -10,6 +10,7 @@ library(emmeans)
 library(forcats)
 library(lmerTest)
 library(readr)
+library(writexl)
 
 rm(list = ls())
 

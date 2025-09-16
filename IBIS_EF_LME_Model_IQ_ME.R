@@ -22,7 +22,7 @@ if (!dir.exists(subdir)) {
 }
 
 # Load data
-ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/Behav_Data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2_addedmissing_age_data_mat_ed_8Sep2025a.csv"))
+ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/Behav_Data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2_addedmissing_age_data_mat_ed_15Sep2025a.csv"))
 
 unique_duplicates <- names(table(ibis_behav_orig$Identifiers)[table(ibis_behav_orig$Identifiers) > 1])
 # Duplicates are UNC0013, UNC0041, UNC0147, UNC0154
@@ -91,12 +91,10 @@ clean_and_calculate_zscores <- function(df, column) {
   cat(column, "removed", num_removed, "rows missing IQ\n")
   
   # # # Count and write ids for rows where mother education string is NA
-  # num_removed <- df %>% filter(is.na(V06.tsi.mother_education)) %>% nrow()
-  # df_clean <- df %>% filter(!is.na(V06.tsi.mother_education))
-  # cat(column, "removed", num_removed, "rows missing maternal education\n")
-  missing_ids <- df_clean$Identifiers[is.na(df_clean$V06.tsi.mother_education)]
-  cat(column, "missing me from following subjects:", paste(missing_ids, collapse = ", "), "\n")
-  
+  num_removed <- df %>% filter(is.na(V06.tsi.mother_education)) %>% nrow()
+  df_clean <- df %>% filter(!is.na(V06.tsi.mother_education))
+  cat(column, "removed", num_removed, "rows missing maternal education\n")
+
   # Remove mother education string column
   df_clean <- df_clean %>% select(-V06.tsi.mother_education)
   

@@ -9,7 +9,8 @@ clean_and_calculate_zscores <- function(df, column, use_covariates = TRUE) {
 
   # Remove all rows containing NA values except for V24 mullens and mother education columns
   df <- df %>%
-    filter(if_all(-c(V24.mullen.composite_standard_score, V06.tsi.mother_education), ~ !is.na(.)))
+    filter(if_all(-c(V24.mullen.composite_standard_score, 
+                     V06.tsi.mother_education), ~ !is.na(.)))
   
   if (use_covariates) {
     # # Remove rows where V24 mullens is NA
@@ -23,10 +24,9 @@ clean_and_calculate_zscores <- function(df, column, use_covariates = TRUE) {
     cat(column, "removed", num_removed_ME, "rows missing maternal education\n")
   }
   else {
-    df_clean = df
+    df_clean <-  df
   }
     
-  
   # Remove mother education string column
   df_clean <- df_clean %>% select(-V06.tsi.mother_education)
   

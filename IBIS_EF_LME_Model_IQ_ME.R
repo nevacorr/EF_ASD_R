@@ -14,6 +14,10 @@ library(writexl)
 
 rm(list = ls())
 
+source("fit_linear_mixed_effects_model_IQ_ME.R")
+source("print_and_save_summary.R")
+source("plot_model_with_age_by_group.R")
+
 # Define output file path
 subdir <- "processed_datafiles"
 
@@ -174,9 +178,6 @@ z_normative_df <- z_normative_df %>% rename(IQ = V24.mullen.composite_standard_s
 # Rename maternal_education to ME
 z_normative_df <- z_normative_df %>% rename(ME = maternal_education)
 
-source("fit_linear_mixed_effects_model_IQ_ME.R")
-source("print_and_save_summary.R")
-
 print("Normative Z-score analysis")
 print("Results for Flanker")
 result_flanker = fit_linear_mixed_effects_model_IQ_ME('Flanker_Standard_Age_Corrected', z_normative_df)
@@ -185,10 +186,7 @@ result_dccs = fit_linear_mixed_effects_model_IQ_ME('DCCS_Standard_Age_Corrected'
 print("Results for Brief2")
 result_brief2 = fit_linear_mixed_effects_model_IQ_ME('BRIEF2_GEC_T_score', z_normative_df)
 
-source("plot_model_with_age_by_group.R")
-
 plot_model_with_age_by_group(result_flanker, "Flanker", "IQ and ME covs")
 plot_model_with_age_by_group(result_dccs, "Dimensional Change Card Sort", "IQ and ME covs")
 plot_model_with_age_by_group(result_brief2, "Brief2", "IQ and ME covs")
 
-mystop=1

@@ -9,3 +9,12 @@
 .DS_Store
 *.xlsx
 *.xcf
+fit_linear_mixed_effects_model_predictschoolage.R 
+plot_model_with_age_by_group.R 
+print_and_save_summary.R
+IBIS_EF_LME_Model.R 
+IBIS_EF_LME_Model_IQ.R 
+IBIS_EF_LME_Model_IQ_ME.R 
+fit_linear_mixed_effects_model.R 
+fit_linear_mixed_effects_model_IQ_ME.R 
+fit_linear_mixed_effects_model_IQ.R

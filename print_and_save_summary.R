@@ -1,9 +1,9 @@
-print_and_save_summary <- function(score_column, model, counts, mystr) {
+print_and_save_summary <- function(score_column, model, counts, emm, mystr, final_data) {
   
   # Filename to save summary
-  model_summary_file <- paste0(score_column, mystr, "_LME_model_summary.csv")
+  model_summary_file <- paste0(score_column, mystr, "_LME_model_summary.xlsx")
   
-  # Extract fixed effects table
+  # MODEL SUMMARY
   fixed_effects <- summary(model)$coefficients %>%
     as.data.frame() %>%
     tibble::rownames_to_column(var = "Term") %>%
@@ -13,62 +13,84 @@ print_and_save_summary <- function(score_column, model, counts, mystr) {
       df = `df`,
       t_value = `t value`,
       p_value = `Pr(>|t|)`
-    ) %>%
-    mutate(across(everything(), as.character))  # all character for CSV
-  
-  # Prepare counts as a two-column table
+    ) 
+
+  # COUNTS
   counts_df <- counts %>%
     mutate(Term = paste("Count -", Time, "-", Group),
            Count = as.character(Count)) %>%
     select(Term, Count)
   
-  # Optional blank row between model and counts
-  blank_row <- data.frame(matrix("", nrow = 1, ncol = ncol(fixed_effects)))
-  colnames(blank_row) <- colnames(fixed_effects)
-  
-  # Write fixed effects first with headers
-  write.table(
-    fixed_effects,
-    file = model_summary_file,
-    sep = ",",
-    row.names = FALSE,
-    col.names = TRUE,
-    quote = FALSE
-  )
-  
-  # Append blank row
-  write.table(
-    blank_row,
-    file = model_summary_file,
-    sep = ",",
-    row.names = FALSE,
-    col.names = FALSE,
-    append = TRUE,
-    quote = FALSE
-  )
-  
-  # Append counts rows without headers
-  # Expand counts to have same columns as fixed_effects for clean CSV
-  counts_write <- counts_df %>%
-    rename(Estimate = Count) %>%
+  # Group contrasts at each timepoint 
+  group_by_time <- contrast(emm, "pairwise", by = "Time") %>%
+    summary(adjust = "none") %>%
     mutate(
-      SE = "",
-      df = "",
-      t_value = "",
-      p_value = ""
-    ) %>%
-    select(colnames(fixed_effects))
+      EffectType = "Interaction: Group × Time",
+      Interval = case_when(
+        Time == "12_months" ~ "12 months",
+        Time == "24_months" ~ "24 months",
+        Time == "school_age" ~ "school age",
+        TRUE ~ as.character(Time)
+      ),
+      ContrastLabel = contrast
+    )
   
-  write.table(
-    counts_write,
-    file = model_summary_file,
-    sep = ",",
-    row.names = FALSE,
-    col.names = FALSE,
-    append = TRUE,
-    quote = FALSE
+  # Time contrasts within each group 
+  time_by_group <- contrast(emm, "pairwise", by = "Group") %>%
+    summary(adjust = "none") %>%
+    mutate(
+      EffectType = "Interaction: Group × Time",
+      GroupLabel = Group,  # keep the group for each row
+      # clean up contrast labels like "12_months - 24_months"
+      Interval = gsub("12_months", "12 months", contrast),
+      Interval = gsub("24_months", "24 months", Interval),
+      Interval = gsub("school_age", "school age", Interval),
+      ContrastLabel = ""
+    )
+  
+  # Combine and apply global FDR correction
+  final_table <- bind_rows(group_by_time, time_by_group) %>%
+    mutate(
+      p.raw = p.value,
+      p.adj.fdr = p.adjust(p.raw, method = "fdr") 
+    ) %>%
+    select(
+      EffectType, Interval, GroupLabel, ContrastLabel, estimate, SE, df, t.ratio, p.raw, p.adj.fdr
+    ) %>%
+    mutate(
+      estimate = ifelse(is.na(estimate), "", sprintf("%.3f", estimate)),
+      SE       = ifelse(is.na(SE), "", sprintf("%.3f", SE)),
+      t.ratio  = ifelse(is.na(t.ratio), "", sprintf("%.3f", t.ratio)),
+      p.raw    = ifelse(is.na(p.raw), "", sprintf("%.3f", p.raw)),
+      p.adj.fdr = ifelse(is.na(p.adj.fdr), "", sprintf("%.3f", p.adj.fdr)),
+      GroupLabel = ifelse(is.na(GroupLabel), "", as.character(GroupLabel))
+    )
+  
+  # Unique subjects
+  subjects_df <- final_data %>%
+    distinct(Identifiers) %>%
+    arrange(Identifiers)
+  
+  # Model equation
+  model_eq <- data.frame(Model_Equation = deparse(formula(model)))
+  
+  # Save all to excel
+  write_xlsx(
+    list(
+      Model_Summary = fixed_effects,
+      Counts = counts_df,
+      Contrasts = final_table, 
+      Unique_Subjects = subjects_df,
+      Model_Equation = model_eq
+    ),
+    path = model_summary_file
   )
   
-  # Print to screen
-  print(bind_rows(fixed_effects, blank_row, counts_write))
+  # Also print to screen
+  print(score_column)
+  print(model_eq)
+  print(fixed_effects)
+  print(counts_df)
+  print(final_table)
+  
 }

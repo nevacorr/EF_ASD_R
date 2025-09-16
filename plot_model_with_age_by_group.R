@@ -27,7 +27,8 @@ plot_model_with_age_by_group <- function(result, score_column, mystr) {
      )
   
   # Save plot to file
-  ggsave(paste("Standardized Raw Scores by Group and Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
+  ggsave(paste("Standardized Raw Scores by Group and Age", score_column, mystr, ".png"), 
+         plot = plot, width = 9, height = 7, dpi = 300, bg="white")
   
   # Get predicted values from the model for each age
   final_data$predicted_score <- predict(model, newdata = final_data)
@@ -52,7 +53,8 @@ plot_model_with_age_by_group <- function(result, score_column, mystr) {
           )
   
   # Save plot to file
-  ggsave(paste("Model of Individual Scores by Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
+  ggsave(paste("Model of Individual Scores by Age", score_column, mystr, ".png"), 
+         plot = plot, width = 9, height = 7,dpi = 300, bg="white")
 
   # Average the data across all subjects in each group
   group_summary <- final_data %>%
@@ -87,6 +89,8 @@ plot_model_with_age_by_group <- function(result, score_column, mystr) {
   print(plot)
   
   # Save plot to file
-  ggsave(paste("Model of Standardized Scores by Group and Age", score_column, "Used for School Age Score", mystr, ".png"), plot = plot, dpi = 300, bg="white")
+  ggsave(paste("Model of Standardized Scores by Group and Age", 
+               score_column, "Used for School Age Score", mystr, ".png"), 
+               plot = plot, width = 9, height = 7, dpi = 300, bg="white")
   
   }

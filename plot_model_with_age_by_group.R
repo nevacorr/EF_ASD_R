@@ -1,7 +1,7 @@
 library(ggplot2)
 library(ggtext)
 
-plot_model_with_age_by_group <- function(result, score_column) {
+plot_model_with_age_by_group <- function(result, score_column, mystr) {
   final_data <- result$final_data
   model <- result$model
   
@@ -52,7 +52,7 @@ plot_model_with_age_by_group <- function(result, score_column) {
           )
   
   # Save plot to file
-  ggsave(paste("Modele of Individual Scores by Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
+  ggsave(paste("Model of Individual Scores by Age", score_column, ".png"), plot = plot, dpi = 300, bg="white")
 
   # Average the data across all subjects in each group
   group_summary <- final_data %>%
@@ -61,13 +61,6 @@ plot_model_with_age_by_group <- function(result, score_column) {
               mean_observed_score = mean(Score),
               .groups = "drop") 
 
-  
-  # Compute difference between predicted and observed
-  # group_summary <- group_summary %>%
-  #   mutate(diff = mean_predicted_score - mean_observed_score)
-  # print(group_summary)
-  # 
-  
   plot <- ggplot(group_summary, aes(x = Time, y = mean_predicted_score, color = Group, group = Group)) +
     geom_point(data = final_data,                        # Plot individual data points
                aes(x = Time, y = Score, color = Group), 
@@ -94,6 +87,6 @@ plot_model_with_age_by_group <- function(result, score_column) {
   print(plot)
   
   # Save plot to file
-  ggsave(paste("Model of Standardized Scores by Group and Age", score_column, " Used for School Age Score IQ and ME covs.png"), plot = plot, dpi = 300, bg="white")
+  ggsave(paste("Model of Standardized Scores by Group and Age", score_column, "Used for School Age Score", mystr, ".png"), plot = plot, dpi = 300, bg="white")
   
   }

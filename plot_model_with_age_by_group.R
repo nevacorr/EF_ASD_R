@@ -65,6 +65,12 @@ plot_model_with_age_by_group <- function(result, score_column) {
               .groups = "drop") 
 
   
+  # Compute difference between predicted and observed
+  # group_summary <- group_summary %>%
+  #   mutate(diff = mean_predicted_score - mean_observed_score)
+  # print(group_summary)
+  # 
+  
   plot <- ggplot(group_summary, aes(x = Time, y = mean_predicted_score, color = Group, group = Group)) +
     geom_point(data = final_data,                        # Plot individual data points
                aes(x = Time, y = Score, color = Group), 

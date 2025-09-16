@@ -5,9 +5,6 @@ plot_model_with_age_by_group <- function(result, score_column) {
   final_data <- result$final_data
   model <- result$model
   
-  # final_data <- final_data %>%
-  #   mutate(Time = fct_relevel(Time, "12_months", "24_months", "school_age"))
-  
   title <- paste("Standardized Raw Scores by Group and Age\n", score_column, "Used for School Age Score", sep = "")
   
   # Plot actual data and lines connected data from the same subject
@@ -75,7 +72,7 @@ plot_model_with_age_by_group <- function(result, score_column) {
     geom_point(data = final_data,                        # Plot individual data points
                aes(x = Time, y = Score, color = Group), 
                alpha = 0.6, size = 2) + 
-    geom_point(aes(y = mean_observed_score), size = 4) +  # Mean observed scores (group level)
+    #geom_point(aes(y = mean_observed_score), size = 4) +  # Mean observed scores (group level)
     geom_line(size = 1) +                                 # Group-level predicted score lines
     labs(title = paste("<b>Executive Function vs. Age by Group</b><br>", 
                        score_column, " used for school age score", sep = ""),
@@ -97,6 +94,6 @@ plot_model_with_age_by_group <- function(result, score_column) {
   print(plot)
   
   # Save plot to file
-  ggsave(paste("Model of Standardized Scores by Group and Age", score_column, " Used for School Age Score.png"), plot = plot, dpi = 300, bg="white")
+  ggsave(paste("Model of Standardized Scores by Group and Age", score_column, " Used for School Age Score IQ and ME covs.png"), plot = plot, dpi = 300, bg="white")
   
   }

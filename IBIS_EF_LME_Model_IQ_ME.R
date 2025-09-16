@@ -187,8 +187,8 @@ result_brief2 = fit_linear_mixed_effects_model_IQ_ME('BRIEF2_GEC_T_score', z_nor
 
 source("plot_model_with_age_by_group.R")
 
-plot_model_with_age_by_group(result_flanker, "Flanker")
-plot_model_with_age_by_group(result_dccs, "Dimensional Change Card Sort")
-plot_model_with_age_by_group(result_brief2, "Brief2")
+plot_model_with_age_by_group(result_flanker, "Flanker", "IQ and ME covs")
+plot_model_with_age_by_group(result_dccs, "Dimensional Change Card Sort", "IQ and ME covs")
+plot_model_with_age_by_group(result_brief2, "Brief2", "IQ and ME covs")
 
 mystop=1

@@ -9,6 +9,7 @@ library(lme4)
 library(emmeans)
 library(forcats)
 library(lmerTest)
+library(readr)
 
 rm(list = ls())
 
@@ -35,8 +36,8 @@ print(table(ibis_behav_rd$V06.tsi.mother_education))
 # Convert maternal education to binary variable (note remove college_degree 
 # if want a little more balanced)
 # Code missing values as 0
-ibis_behav_rd$maternal_education <- 
-  ifelse(ibis_behav_rd$V06.tsi.mother_education %in% c("college_degree", "some_grad_level", 
+ibis_behav_rd$maternal_education <-
+  ifelse(ibis_behav_rd$V06.tsi.mother_education %in% c("college_degree", "some_grad_level",
                                                        "grad_degree"), 1, 0)
 
 print(table(ibis_behav_rd$maternal_education, useNA = "ifany"))

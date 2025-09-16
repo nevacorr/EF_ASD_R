@@ -18,8 +18,7 @@ print_and_save_summary_Final <- function(score_column, model, counts, emm, covst
 
   # COUNTS
   counts_df <- counts %>%
-    mutate(Term = paste("Count -", Time, "-", Group),
-           Count = as.character(Count)) %>%
+    mutate(Term = paste("Count -", Time, "-", Group)) %>%
     select(Term, Count)
   
   # Group contrasts at each timepoint 
@@ -57,14 +56,6 @@ print_and_save_summary_Final <- function(score_column, model, counts, emm, covst
     ) %>%
     select(
       EffectType, Interval, GroupLabel, ContrastLabel, estimate, SE, df, t.ratio, p.raw, p.adj.fdr
-    ) %>%
-    mutate(
-      estimate = ifelse(is.na(estimate), "", sprintf("%.3f", estimate)),
-      SE       = ifelse(is.na(SE), "", sprintf("%.3f", SE)),
-      t.ratio  = ifelse(is.na(t.ratio), "", sprintf("%.3f", t.ratio)),
-      p.raw    = ifelse(is.na(p.raw), "", sprintf("%.3f", p.raw)),
-      p.adj.fdr = ifelse(is.na(p.adj.fdr), "", sprintf("%.3f", p.adj.fdr)),
-      GroupLabel = ifelse(is.na(GroupLabel), "", as.character(GroupLabel))
     )
   
   # Unique subjects

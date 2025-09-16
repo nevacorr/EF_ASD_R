@@ -7,7 +7,6 @@ library(lmerTest)
 library(readr)
 library(writexl)
 library(ggplot2)
-library(forcats)
 
 rm(list = ls())
 
@@ -65,7 +64,7 @@ iq_df_subset[["V24.mullen.composite_standard_score"]]<-
 ibis_behav <- merge(ibis_behav_rd, iq_df_subset, by = 'Identifiers', all.x=TRUE)
 
 # Write dataframe to file
-write.csv(ibis_behav, file = file.path(subdir, 'ibis_subj_demographics_and_data_used_for_2025analysis_plusIQandME.csv'), row.names = FALSE)
+write.csv(ibis_behav, file = file.path(subdir, 'ibis_subj_demographics_and_data_used_for_2025analysis.csv'), row.names = FALSE)
 
 # Rename groups
 ibis_behav <- ibis_behav %>%
@@ -100,7 +99,7 @@ for(use_covariates in c(TRUE, FALSE)) {
     ab24_df_norm <- clean_and_calculate_zscores(ab24_df, 'AB_24_Percent', use_covariates)
     
     # Select the Identifiers column for the score
-    df_selected <- df_norm %>% select(Identifiers, score_col)
+    df_selected <- df_norm %>% select(Identifiers, all_of(score_col))
     ab12_selected <- ab12_df_norm %>% select(Identifiers, 'AB_12_Percent')
     ab24_selected <- ab24_df_norm %>% select(Identifiers, 'AB_24_Percent')
     

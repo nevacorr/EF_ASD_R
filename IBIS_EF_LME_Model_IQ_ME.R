@@ -90,9 +90,9 @@ clean_and_calculate_zscores <- function(df, column) {
   df_clean <- df %>% filter(!is.na(V24.mullen.composite_standard_score))
   cat(column, "removed", num_removed, "rows missing IQ\n")
   
-  # # # Count and write ids for rows where mother education string is NA
-  num_removed <- df %>% filter(is.na(V06.tsi.mother_education)) %>% nrow()
-  df_clean <- df %>% filter(!is.na(V06.tsi.mother_education))
+  # # # Remove rows where maternal education is NA
+  num_removed <- df_clean %>% filter(is.na(V06.tsi.mother_education)) %>% nrow()
+  df_clean <- df_clean %>% filter(!is.na(V06.tsi.mother_education))
   cat(column, "removed", num_removed, "rows missing maternal education\n")
 
   # Remove mother education string column
@@ -174,6 +174,7 @@ z_normative_df <- z_normative_df %>% rename(IQ = V24.mullen.composite_standard_s
 z_normative_df <- z_normative_df %>% rename(ME = maternal_education)
 
 source("fit_linear_mixed_effects_model_IQ_ME.R")
+source("print_and_save_summary.R")
 
 print("Normative Z-score analysis")
 print("Results for Flanker")

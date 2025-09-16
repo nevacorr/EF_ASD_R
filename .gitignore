@@ -7,3 +7,4 @@
 *.csv
 *.Rproj
 .DS_Store
+*.xls

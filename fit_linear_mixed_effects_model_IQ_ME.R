@@ -22,22 +22,18 @@ fit_linear_mixed_effects_model_IQ_ME <- function(score_column, data) {
   final_data <- long_data %>%
     filter(!is.na(Score))  # Remove rows with missing scores
   
+  # Calculate number of subjects per age group
   counts <- final_data %>%
     group_by(Time, Group) %>%
     summarise(Count = n(), .groups = "drop")
-  
-  print('Number of Subjects Per Age Point')
-  print(counts)
   
   # Create a model that relates scores at all ages to group and time point, takes sex 
   # IQ and ME into account and includes subject as random factor
   model <- lmer(Score ~ Sex + IQ + ME + Group + Time + Group * Time 
                 + (1 | Identifiers), data = final_data)
   
-  print(paste("Model using", score_column, "as School Age EF measure"))
-  print(paste("All Scores Converted to Z-scores"))
-  print(summary(model))
-  print(anova(model))
+  # Print results to screen and to file
+  print_and_save_summary(score_column, model, counts, '_IQandMEcovariates')
   
   # Compute emmeans for all factors involved
   emm <- emmeans(model,  ~ Group * Time)
@@ -101,42 +97,6 @@ fit_linear_mixed_effects_model_IQ_ME <- function(score_column, data) {
   # View table
   print(final_table)
  
-  # # Compute contrasts separately
-  # group_contrasts <- contrast(emm, "pairwise", by = "Time")   # Group | Time
-  # time_contrasts  <- contrast(emm, "pairwise", by = "Group")  # Time | Group
-  # 
-  # # Convert to data frames and add a label column
-  # df_group <- as.data.frame(group_contrasts) %>%
-  #   mutate(contrast_type = "Group | Time")
-  # 
-  # df_time <- as.data.frame(time_contrasts) %>%
-  #   mutate(contrast_type = "Time | Group")
-  # 
-  # # Combine both sets into one table
-  # all_contrasts <- bind_rows(df_group, df_time)
-  # 
-  # # Apply global p-value adjustment across all contrasts
-  # all_contrasts <- all_contrasts %>%
-  #   mutate(
-  #     p.adj.global = p.adjust(p.value, method = "fdr"),
-  #     # Format p-values as decimal with 3 digits
-  #     p.value = formatC(p.value, format = "f", digits = 3),
-  #     p.adj.global = formatC(p.adj.global, format = "f", digits = 3)
-  #     )   
-  # 
-  # # Reorder and select columns to print
-  # all_contrasts <- all_contrasts %>%
-  #   select(Time, Group, contrast, estimate, SE, df, t.ratio, p.value, p.adj.global, contrast_type)
-  # 
-  # # Replace NA values with empty space
-  # all_contrasts_print <- all_contrasts %>%
-  #   mutate(across(where(is.factor), as.character)) %>%  # convert only factors to character
-  #   mutate(across(everything(), ~ ifelse(is.na(.), "", .)))  # replace NA with blanks
-  # 
-  # # Print to screen
-  # print(all_contrasts_print)
-  
-  
   return(list(final_data = final_data, model = model))
   
 }

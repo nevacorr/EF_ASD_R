@@ -26,11 +26,14 @@ if (!dir.exists(subdir)) {
 school_age_outcome_vars <- c(
   Flanker_Standard_Age_Corrected = 'Flanker_Standard_Age_Corrected',
   DCCS_Standard_Age_Corrected = 'DCCS_Standard_Age_Corrected',
-  BRIEF2_GEC_T_score = 'BRIEF2_GEC_T_score'
+  BRIEF2_GEC_T_score = 'BRIEF2_GEC_T_score',
+  BRIEF2_shift_T_score = 'BRIEF2_shift_T_score',
+  BRIEF2_inhibit_T_score = 'BRIEF2_inhibit_T_score',
+  BRIEF2_working_memory_T_score = 'BRIEF2_working_memory_T_score'
 )
 
 # Load data
-ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/Behav_Data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2_addedmissing_age_data_mat_ed_15Sep2025a.csv"))
+ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/Behav_Data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2_Brief2subscales_15Oct2025.csv"))
 
 unique_duplicates <- names(table(ibis_behav_orig$Identifiers)[table(ibis_behav_orig$Identifiers) > 1])
 # Duplicates are UNC0013, UNC0041, UNC0147, UNC0154
@@ -64,7 +67,7 @@ iq_df_subset[["V24.mullen.composite_standard_score"]]<-
 ibis_behav <- merge(ibis_behav_rd, iq_df_subset, by = 'Identifiers', all.x=TRUE)
 
 # Write dataframe to file
-write.csv(ibis_behav, file = file.path(subdir, 'ibis_subj_demographics_and_data_used_for_2025analysis.csv'), row.names = FALSE)
+write.csv(ibis_behav, file = file.path(subdir, 'ibis_subj_demographics_and_data_used_for_2025analysis_with_Brief2_subscales.csv'), row.names = FALSE)
 
 # Rename groups
 ibis_behav <- ibis_behav %>%
@@ -98,6 +101,11 @@ for(use_covariates in c(TRUE, FALSE)) {
     ab12_df_norm <- clean_and_calculate_zscores(ab12_df, 'AB_12_Percent', use_covariates)
     ab24_df_norm <- clean_and_calculate_zscores(ab24_df, 'AB_24_Percent', use_covariates)
     
+    # Write cleaned dataframes to file
+    write.csv(df_norm, file=file.path(subdir, paste0(score_col, '_used_for_2025analysis_', cov_label, '.csv')), row.names = FALSE)
+    write.csv(ab12_df_norm, file=file.path(subdir, paste0('ab12_used_for_2025analysis_', cov_label, '.csv')), row.names = FALSE)
+    write.csv(ab24_df_norm, file=file.path(subdir, paste0('ab24_used_for_2025analysis_', cov_label,'.csv')), row.names = FALSE)
+    
     # Select the Identifiers column for the score
     df_selected <- df_norm %>% select(Identifiers, all_of(score_col))
     ab12_selected <- ab12_df_norm %>% select(Identifiers, 'AB_12_Percent')
@@ -113,9 +121,12 @@ for(use_covariates in c(TRUE, FALSE)) {
       left_join(ab12_selected, by = "Identifiers") %>%
       left_join(ab24_selected, by = "Identifiers")
     
-    if (score_col == "BRIEF2_GEC_T_score") {
-      # Flip the sign of the Brief2 column
-      z_normative_df$BRIEF2_GEC_T_score <- -z_normative_df$BRIEF2_GEC_T_score
+    if (score_col %in% c("BRIEF2_GEC_T_score",
+                         "BRIEF2_shift_T_score",
+                         "BRIEF2_working_memory_T_score",
+                         "BRIEF2_inhibit_T_score")) {
+      # Flip the sign of the corresponding column
+      z_normative_df[[score_col]] <- -z_normative_df[[score_col]]
     }
     
     # Convert empty strings in Group column to NA 

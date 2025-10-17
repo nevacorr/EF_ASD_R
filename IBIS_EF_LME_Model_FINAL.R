@@ -33,22 +33,16 @@ school_age_outcome_vars <- c(
 )
 
 # Load data
-ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/Behav_Data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF2_Brief2subscales_15Oct2025.csv"))
-
-unique_duplicates <- names(table(ibis_behav_orig$Identifiers)[table(ibis_behav_orig$Identifiers) > 1])
-# Duplicates are UNC0013, UNC0041, UNC0147, UNC0154
-
-# Remove rows with duplicate identifiers
-ibis_behav_rd <- ibis_behav_orig[!duplicated(ibis_behav_orig$Identifiers), ]
+ibis_behav_orig <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/Behav_Data/IBIS_behav_dataframe_demographics_AnotB_Flanker_DCCS_BRIEF1+2_Brief2subscales_16Oct2025.csv"))
 
 # Convert maternal education to binary variable 
-ibis_behav_rd$maternal_education <-
-  ifelse(ibis_behav_rd$V06.tsi.mother_education %in% c("college_degree", "some_grad_level",
+ibis_behav_orig$maternal_education <-
+  ifelse(ibis_behav_orig$V06.tsi.mother_education %in% c("college_degree", "some_grad_level",
                                                        "grad_degree"), 1, 0)
 
 # If BRIEF2 columns have prefix "VSD.All" and Parent substrings, remove these substrings
-names(ibis_behav_rd) <- gsub("^VSD\\.All\\.BRIEF2_", "BRIEF2_", names(ibis_behav_rd))
-names(ibis_behav_rd) <- gsub("^BRIEF2_Parent.", "BRIEF2_", names(ibis_behav_rd))
+names(ibis_behav_orig) <- gsub("^VSD\\.All\\.BRIEF2_", "BRIEF2_", names(ibis_behav_orig))
+names(ibis_behav_orig) <- gsub("^BRIEF2_Parent.", "BRIEF2_", names(ibis_behav_orig))
 
 # Load IQ data
 iq_df <- read.csv(file.path("/Users/nevao/Documents/IBIS_EF/source data/Behav_Data/IQ data_Long_data-2025-07-26T23_51_14.152Z.csv"))
@@ -64,10 +58,10 @@ iq_df_subset[["V24.mullen.composite_standard_score"]]<-
   na.rm = TRUE)) / sd(iq_df_subset[["V24.mullen.composite_standard_score"]], na.rm = TRUE)
 
 # Merge IQ data with rest of dataframe
-ibis_behav <- merge(ibis_behav_rd, iq_df_subset, by = 'Identifiers', all.x=TRUE)
+ibis_behav <- merge(ibis_behav_orig, iq_df_subset, by = 'Identifiers', all.x=TRUE)
 
 # Write dataframe to file
-write.csv(ibis_behav, file = file.path(subdir, 'ibis_subj_demographics_and_data_used_for_2025analysis_with_Brief2_subscales.csv'), row.names = FALSE)
+write.csv(ibis_behav, file = file.path(subdir, 'ibis_subj_demographics_and_data_used_for_2025analysis_with_Brief2_subscales_with_brief1.csv'), row.names = FALSE)
 
 # Rename groups
 ibis_behav <- ibis_behav %>%

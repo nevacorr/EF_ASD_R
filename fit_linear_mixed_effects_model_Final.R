@@ -18,6 +18,10 @@ fit_linear_mixed_effects_model_Final <- function(score_column, data, use_covaria
   final_data <- long_data %>%
     filter(!is.na(Score))  # Remove rows with missing scores
   
+  # Set Time factor with 24 months as reference
+  final_data <- final_data %>%
+    mutate(Time = factor(Time, levels = c("24_months", "12_months", "school_age")))
+  
   # Calculate number of subjects per age group
   counts <- final_data %>%
     group_by(Time, Group) %>%
